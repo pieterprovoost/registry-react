@@ -1,21 +1,40 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { Router, Route, Switch, NavLink } from "react-router-dom";
+import history from './history'
+
+import NavBar from './components/NavBar'
+import Home from './components/Home'
+import Installation from './components/Installation'
+import Dataset from './components/Dataset'
+
 import './App.css';
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+      <Router history={history}>
+        <div >
+          <NavBar />
+          <main>
+            <Switch>
+              <Route exact path="/" render={(props) => <Home />} />
+              <Route path="/dataset" render={(props) => <Dataset />} />
+              <Route path="/installation" render={(props) => <Installation />} />
+              <Route component={NoMatch} />
+            </Switch>
+          </main>
+        </div>
+      </Router>
     );
   }
 }
+
+const NoMatch = ({ location }) => (
+  <div>
+    <h3>
+      404 - No match for <code>{location.pathname}</code>
+    </h3>
+  </div>
+);
 
 export default App;
