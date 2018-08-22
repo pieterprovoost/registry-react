@@ -5,6 +5,7 @@ import history from './history'
 import NavBar from './components/NavBar'
 import Home from './components/Home'
 import Installation from './components/Installation'
+import InstallationKey from './components/InstallationKey'
 import Dataset from './components/Dataset'
 
 import './App.css';
@@ -172,6 +173,7 @@ class App extends Component {
               <Switch>
                 <Route exact path="/" render={(props) => <Home />} />
                 <Route path="/dataset" render={(props) => <Dataset />} />
+                <Route path="/installation/:installationKey" component={InstallationKey}/>
                 <Route path="/installation" render={(props) => <Installation />} />
                 <Route component={NoMatch} />
               </Switch>
