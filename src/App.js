@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Router, Route, Switch, NavLink } from "react-router-dom";
+import { Router, Route, Switch } from "react-router-dom";
 import history from './history'
 
-import NavBar from './components/NavBar'
 import Home from './components/Home'
 import Installation from './components/Installation'
 import InstallationKey from './components/InstallationKey'
-import Dataset from './components/Dataset'
+import OrganizationSearch from './components/organization/OrganizationSearch'
+import Organization from './components/organization/Organization'
+import DrawerContent from './components/DrawerContent'
 
 import './App.css';
 
@@ -14,24 +15,15 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import blue from '@material-ui/core/colors/blue';
 import pink from '@material-ui/core/colors/pink';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-
 import IconButton from '@material-ui/core/IconButton';
-import InboxIcon from '@material-ui/icons/Inbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
 import MenuIcon from '@material-ui/icons/Menu';
 import Hidden from '@material-ui/core/Hidden';
+import AppBarTitle from './components/AppBarTitle';
 
 const theme = createMuiTheme({
   palette: {
@@ -43,7 +35,7 @@ const theme = createMuiTheme({
   },
 });
 
-const drawerWidth = 240;
+const drawerWidth = 340;
 
 const styles = theme => ({
   root: {
@@ -94,35 +86,6 @@ class App extends Component {
   render() {
     const { classes } = this.props;
 
-    const drawer = (
-      <div>
-        <Divider />
-        <List component="nav">
-          <ListItem button component={NavLink} to={{ pathname: '/dataset' }} exact={true} activeClassName="active">
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary="Dataset" />
-          </ListItem>
-          <ListItem button component={NavLink} to={{ pathname: '/installation' }} exact={true} activeClassName="active">
-            <ListItemIcon>
-              <DraftsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Installation" />
-          </ListItem>
-        </List>
-        <Divider />
-        <List component="nav">
-          <ListItem button>
-            <ListItemText primary="Login" />
-          </ListItem>
-          <ListItem button component="a" href="#simple-list">
-            <ListItemText primary="Something" />
-          </ListItem>
-        </List>
-      </div>
-    );
-
     return (
       <Router history={history}>
         <MuiThemeProvider theme={theme}>
@@ -138,8 +101,8 @@ class App extends Component {
                   <MenuIcon />
                 </IconButton>
                 <Typography variant="title" color="inherit" noWrap>
-                  Registry - but i guess this should be the route title?
-            </Typography>
+                  <Route path="/:type?/:key?/:section?" component={AppBarTitle} />
+                </Typography>
               </Toolbar>
             </AppBar>
             <Hidden mdUp>
@@ -155,7 +118,7 @@ class App extends Component {
                   keepMounted: true, // Better open performance on mobile.
                 }}
               >
-                {drawer}
+                <Route path="/:type?/:key?/:section?" component={DrawerContent} />
               </Drawer>
             </Hidden>
             <Hidden smDown implementation="css">
@@ -166,14 +129,17 @@ class App extends Component {
                   paper: classes.drawerPaper,
                 }}
               >
-                {drawer}
+                <Route path="/:type?/:key?/:section?" component={DrawerContent} />
               </Drawer>
             </Hidden>
             <main className={classes.content}>
               <div className={classes.toolbar} />
               <Switch>
                 <Route exact path="/" render={(props) => <Home />} />
-                <Route path="/dataset" render={(props) => <Dataset />} />
+                <Route exact path="/test" render={(props) => <Home />} />
+                <Route exact path="/test/test" render={(props) => <Home />} />
+                <Route path="/organization" render={(props) => <OrganizationSearch />} exact />
+                <Route path="/organization/:organizationKey" render={(props) => <Organization />} />
                 <Route path="/installation/:installationKey" component={InstallationKey}/>
                 <Route path="/installation" render={(props) => <Installation />} />
                 <Route component={NoMatch} />
