@@ -68,7 +68,7 @@ const styles = theme => ({
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3,
+    // padding: theme.spacing.unit * 3,
     height: '100vh',
     overflow: 'auto',
   },
@@ -139,8 +139,8 @@ class App extends Component {
                 <Route exact path="/test" render={(props) => <Home />} />
                 <Route exact path="/test/test" render={(props) => <Home />} />
                 <Route path="/organization" render={(props) => <OrganizationSearch />} exact />
-                <Route path="/organization/:organizationKey" render={(props) => <Organization />} />
-                <Route path="/installation/:installationKey" component={InstallationKey}/>
+                <Route path="/organization/:organizationKey/:section?" component={Organization} />
+                <Route path="/installation/:installationKey" component={InstallationKey} />
                 <Route path="/installation" render={(props) => <Installation />} />
                 <Route component={NoMatch} />
               </Switch>
