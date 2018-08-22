@@ -105,7 +105,6 @@ class Installation extends React.Component {
     const { data, rowsPerPage, page, count, rowsPerPageOptions } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, count - page * rowsPerPage);
     return (
-      <main>
       <Paper className={classes.root}>
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -153,7 +152,6 @@ class Installation extends React.Component {
           </Table>
         </div>
       </Paper>
-      </main>
     );
   }
 }
