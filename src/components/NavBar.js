@@ -64,21 +64,17 @@ function ClippedDrawer(props) {
             >
                 <div className={classes.toolbar} />
                 <List component="nav">
-                    <ListItem button>
+                    <ListItem button component={NavLink} to={{ pathname: '/dataset'}} exact={true} activeClassName="active">
                         <ListItemIcon>
                             <InboxIcon />
                         </ListItemIcon>
-                        <ListItemText>
-                            <NavLink to={{ pathname: '/dataset'}} exact={true} activeClassName="active">Dataset</NavLink>
-                        </ListItemText>
+                        <ListItemText primary="Dataset" />
                     </ListItem>
-                    <ListItem button>
+                    <ListItem button component={NavLink} to={{ pathname: '/installation'}} exact={true} activeClassName="active">
                         <ListItemIcon>
                             <DraftsIcon />
                         </ListItemIcon>
-                        <ListItemText>
-                            <NavLink to={{ pathname: '/installation'}} exact={true} activeClassName="active">Installation</NavLink>
-                        </ListItemText>
+                        <ListItemText primary="Installation" />
                     </ListItem>
                 </List>
                 <Divider />
