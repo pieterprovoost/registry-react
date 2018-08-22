@@ -24,6 +24,7 @@ class InstallationKey extends React.Component {
    
     render() {
         const { match: { params: {installationKey} } } = this.props;
+        console.log(installationKey);
      //  const {data: {title}} = this.state;
         return (
         <main>
