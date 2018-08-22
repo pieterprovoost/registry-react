@@ -20,7 +20,6 @@ const _ = require('lodash')
 
 function getInstallations(filter, limit, offset) {
 
-  //dispatcher.dispatch({type: "FETCH_DATA", filter, limit, offset});
   var limit = limit || 100;
   var offset = offset || 0;
   var url = 'http://api.gbif.org/v1/installation?limit=' + limit + "&offset=" + offset;
