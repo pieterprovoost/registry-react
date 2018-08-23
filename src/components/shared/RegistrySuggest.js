@@ -21,7 +21,7 @@ function debounce(fn, time) {
   }
 }
 
-const baseEndpoint = 'http://api.gbif.org/v1/organization?q='
+const baseEndpoint = 'http://api.gbif.org/v1/'
 
 
 function renderInput(inputProps) {
@@ -38,13 +38,14 @@ function renderInput(inputProps) {
         ...InputProps,
       }}
       {...other}
+      margin="normal"
     />
   );
 }
 
 function renderSuggestion({ suggestion, index, itemProps, highlightedIndex, selectedItem }) {
   const isHighlighted = highlightedIndex === index;
-  const isSelected = (selectedItem || '').indexOf(suggestion.label) > -1;
+  const isSelected = selectedItem && suggestion.title;
 
   return (
     <MenuItem
@@ -64,8 +65,8 @@ renderSuggestion.propTypes = {
   highlightedIndex: PropTypes.number,
   index: PropTypes.number,
   itemProps: PropTypes.object,
-  selectedItem: PropTypes.string,
-  suggestion: PropTypes.shape({ label: PropTypes.string }).isRequired,
+  selectedItem: PropTypes.object,
+  suggestion: PropTypes.shape({ title: PropTypes.string, key: PropTypes.string }).isRequired,
 };
 
 
@@ -99,15 +100,16 @@ const styles = theme => ({
 
 
 
-class OrganizationSuggest extends React.Component {
+class RegistrySuggest extends React.Component {
     constructor(props) {
       super(props)
       this.state = {items: []}
+      this.endpoint = baseEndpoint + this.props.type +'?q='
     }
   
     fetchRepository = debounce(value => {
       axios
-        .get(baseEndpoint + value)
+        .get(this.endpoint +'*'+ value+'*')
         .then(response => {
           const items = response.data.results; 
           this.setState({items})
@@ -118,18 +120,21 @@ class OrganizationSuggest extends React.Component {
     }, 300)
   
     render() {
-        const { classes } = this.props;
-        const { organization } = this.props;
+        const { classes, onChange, selected, placeholder } = this.props;
       return (
         <div className={classes.root}>
-        <Downshift id="downshift-simple">
-          {({ getInputProps, getItemProps, isOpen, inputValue, selectedItem, highlightedIndex }) => (
+        <Downshift id="downshift-simple"
+         onChange={onChange}
+         selectedItem={selected}
+         itemToString={item => (item ? item.title : '')}
+         >
+          {({ getInputProps, getItemProps, isOpen, selectedItem, highlightedIndex }) => (
             <div className={classes.container}>
               {renderInput({
                 fullWidth: true,
                 classes,
                 InputProps: getInputProps({
-                  placeholder: 'Search publishers',
+                  placeholder: placeholder || '',
                       onChange: event => {
                         const value = event.target.value
                         if (!value) {
@@ -147,7 +152,7 @@ class OrganizationSuggest extends React.Component {
                     renderSuggestion({
                       suggestion,
                       index,
-                      itemProps: getItemProps({ item: suggestion.title }),
+                      itemProps: getItemProps({ item: suggestion }),
                       highlightedIndex,
                       selectedItem,
                     }),
@@ -164,8 +169,15 @@ class OrganizationSuggest extends React.Component {
   }
 
 
-  OrganizationSuggest.propTypes = {
+  RegistrySuggest.propTypes = {
   classes: PropTypes.object.isRequired,
+  type: PropTypes.oneOf(['dataset', 'organization', 'installation', 'node', 'network']).isRequired,
+  onChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+  selected: PropTypes.shape({
+    key: PropTypes.string,
+    title: PropTypes.string
+  }),
 };
 
-export default withStyles(styles)(OrganizationSuggest);
+export default withStyles(styles)(RegistrySuggest);

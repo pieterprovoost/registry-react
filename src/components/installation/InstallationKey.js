@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 //import AxiosAutocomplete from './AutoSuggest'
-import OrganizationSuggest from './OrganizationSuggest'
+import RegistrySuggest from '../shared/RegistrySuggest'
 
 const styles = theme => ({
     container: {
@@ -68,6 +68,14 @@ class InstallationKey extends React.Component {
             data: data,
         });
     };
+
+    handleOrganizationChange = org => {
+        var data = { ...this.state.data }
+        data.organization = org
+        this.setState({
+            data: data,
+        });
+    }
     render() {
         const { resolved } = this.state;
         const { classes } = this.props;
@@ -126,7 +134,7 @@ class InstallationKey extends React.Component {
                         
                     }
 
-                <OrganizationSuggest organization={data.organization} />
+                <RegistrySuggest onChange={this.handleOrganizationChange} selected={data.organization} type={'organization'} />
 
                 </form>
             )

@@ -3,8 +3,8 @@ import { Router, Route, Switch } from "react-router-dom";
 import history from './history'
 
 import Home from './components/Home'
-import Installation from './components/Installation'
-import InstallationKey from './components/InstallationKey'
+import Installation from './components/installation/Installation'
+import InstallationKey from './components/installation/InstallationKey'
 import OrganizationSearch from './components/organization/OrganizationSearch'
 import Organization from './components/organization/Organization'
 import DrawerContent from './components/DrawerContent'
@@ -141,7 +141,7 @@ class App extends Component {
                 <Route path="/organization" render={(props) => <OrganizationSearch />} exact />
                 <Route path="/organization/:organizationKey/:section?" component={Organization} />
                 <Route path="/installation/:installationKey" component={InstallationKey} />
-                <Route path="/installation" render={(props) => <Installation />} />
+                <Route exact path="/installation" render={(props) => <Installation />} />
                 <Route component={NoMatch} />
               </Switch>
             </main>
