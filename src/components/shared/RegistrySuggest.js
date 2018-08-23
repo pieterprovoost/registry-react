@@ -74,6 +74,8 @@ renderSuggestion.propTypes = {
 const styles = theme => ({
   root: {
     flexGrow: 1,
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
     height: 250,
   },
   container: {
@@ -91,7 +93,7 @@ const styles = theme => ({
     margin: `${theme.spacing.unit / 2}px ${theme.spacing.unit / 4}px`,
   },
   inputRoot: {
-    flexWrap: 'wrap',
+    flexWrap: 'wrap'
   },
   divider: {
     height: theme.spacing.unit * 2,

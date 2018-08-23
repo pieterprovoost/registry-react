@@ -3,8 +3,9 @@ import axios from "axios";
 import { withStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
-//import AxiosAutocomplete from './AutoSuggest'
 import RegistrySuggest from '../shared/RegistrySuggest'
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 const styles = theme => ({
     container: {
@@ -51,10 +52,10 @@ class InstallationKey extends React.Component {
         var that = this;
         const { match: { params: { installationKey } } } = this.props;
         var installation;
-        axios(`https://api.gbif.org/v1/installation/${installationKey}`)
+        axios(`https://api.gbif-dev.org/v1/installation/${installationKey}`)
             .then((result) => {
                 installation = result.data;
-                return axios('http://api.gbif.org/v1/organization/' + result.data.organizationKey)
+                return axios('http://api.gbif-dev.org/v1/organization/' + result.data.organizationKey)
             })
             .then(function (res) {
                 installation.organization = res.data
@@ -67,14 +68,26 @@ class InstallationKey extends React.Component {
         this.setState({
             data: data,
         });
+        console.log(data)
     };
 
     handleOrganizationChange = org => {
         var data = { ...this.state.data }
         data.organization = org
+        data.organizationKey = org.key
         this.setState({
             data: data,
         });
+        console.log(data)
+    }
+    setDisabled = val => {
+        var data = { ...this.state.data }
+        data.disabled = val
+        this.setState({
+            data: data,
+        });
+        console.log(data)
+
     }
     render() {
         const { resolved } = this.state;
@@ -131,10 +144,20 @@ class InstallationKey extends React.Component {
                                 </MenuItem>
                             ))}
                         </TextField>
-                        
+
                     }
 
-                <RegistrySuggest onChange={this.handleOrganizationChange} selected={data.organization} type={'organization'} />
+                    <RegistrySuggest onChange={this.handleOrganizationChange} selected={data.organization} type={'organization'} />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={this.state.data.disabled}
+                                onChange={(e, checked) => this.setDisabled(checked)}
+                            />
+                        }
+                        label="Disabled"
+                    />
+
 
                 </form>
             )
