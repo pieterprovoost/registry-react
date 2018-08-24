@@ -140,7 +140,7 @@ class App extends Component {
                 <Route exact path="/test/test" render={(props) => <Home />} />
                 <Route path="/organization" render={(props) => <OrganizationSearch />} exact />
                 <Route path="/organization/:organizationKey/:section?" component={Organization} />
-                <Route path="/installation/:installationKey" component={InstallationKey} />
+                <Route path="/installation/:key" component={InstallationKey} />
                 <Route exact path="/installation" render={(props) => <Installation />} />
                 <Route component={NoMatch} />
               </Switch>

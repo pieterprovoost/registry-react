@@ -6,19 +6,30 @@ import TextField from '@material-ui/core/TextField';
 import RegistrySuggest from '../shared/RegistrySuggest'
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
 
 const styles = theme => ({
+    root: {
+        flexGrow: 1,
+        margin: 20,
+        padding: 20,
+    },
     container: {
         display: 'flex',
         flexWrap: 'wrap',
     },
     textField: {
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
-        width: 400,
+       
+        width: '100%',
     },
     menu: {
-        width: 200,
+        
+        width: '100%',
+    },
+    paper: {
+        padding: theme.spacing.unit * 2,
+        color: theme.palette.text.secondary,
     },
 });
 
@@ -50,12 +61,12 @@ class InstallationKey extends React.Component {
 
     getData() {
         var that = this;
-        const { match: { params: { installationKey } } } = this.props;
+        const { match: { params: { key } } } = this.props;
         var installation;
-        axios(`https://api.gbif-dev.org/v1/installation/${installationKey}`)
+        axios(`https://api.gbif.org/v1/installation/${key}`)
             .then((result) => {
                 installation = result.data;
-                return axios('http://api.gbif-dev.org/v1/organization/' + result.data.organizationKey)
+                return axios('http://api.gbif.org/v1/organization/' + result.data.organizationKey)
             })
             .then(function (res) {
                 installation.organization = res.data
@@ -96,7 +107,7 @@ class InstallationKey extends React.Component {
         if (!resolved) {
             return (
                 <main>
-                    'Loading'
+                    Loading...
                 </main>
             )
         } else {
@@ -104,59 +115,73 @@ class InstallationKey extends React.Component {
             const { data } = this.state;
             return (
                 <form className={classes.container} noValidate autoComplete="off">
-                    <TextField
-                        id="title"
-                        label="Title"
-                        className={classes.textField}
-                        value={this.state.data.title}
-                        onChange={this.handleChange('title')}
-                        margin="normal"
-                    />
-                    <TextField
-                        id="description"
-                        label="Description"
-                        className={classes.textField}
-                        multiline={true}
+                    <div className={classes.root}>
+                        <Grid container spacing={8}>
+                            <Grid item xs={0} md={2}/>
+                            <Grid item xs={12} md={8}>
+                                <Paper className={classes.paper}>
+                                    <TextField
+                                        id="title"
+                                        label="Title"
+                                        className={classes.textField}
+                                        value={this.state.data.title}
+                                        onChange={this.handleChange('title')}
+                                        margin="normal"
+                                    />
+                                    <RegistrySuggest onChange={this.handleOrganizationChange} selected={data.organization} type={'organization'} />
+                                    <TextField
+                                        id="description"
+                                        label="Description"
+                                        className={classes.textField}
+                                        multiline={true}
 
-                        value={this.state.data.description}
-                        onChange={this.handleChange('description')}
-                        margin="normal"
-                    />
-                    {this.state.installationTypes &&
-                        <TextField
-                            id="select-type"
-                            select
-                            label="InstallationType"
-                            className={classes.textField}
-                            value={data.type}
-                            onChange={this.handleChange('type')}
-                            SelectProps={{
-                                MenuProps: {
-                                    className: classes.menu,
-                                },
-                            }}
-                            helperText="Please select installation type"
-                            margin="normal"
-                        >
-                            {this.state.installationTypes.map(option => (
-                                <MenuItem key={option} value={option}>
-                                    {option}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                                        value={this.state.data.description}
+                                        onChange={this.handleChange('description')}
+                                        margin="normal"
+                                    />
+                                    {this.state.installationTypes &&
+                                        <TextField
+                                            id="select-type"
+                                            select
+                                            label="InstallationType"
+                                            className={classes.textField}
+                                            value={data.type}
+                                            onChange={this.handleChange('type')}
+                                            SelectProps={{
+                                                MenuProps: {
+                                                    className: classes.menu,
+                                                },
+                                            }}
+                                            helperText="Please select installation type"
+                                            margin="normal"
+                                        >
+                                            {this.state.installationTypes.map(option => (
+                                                <MenuItem key={option} value={option}>
+                                                    {option}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
 
-                    }
+                                    }
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={this.state.data.disabled}
+                                                onChange={(e, checked) => this.setDisabled(checked)}
+                                            />
+                                        }
+                                        label="Disabled"
+                                    />
+                                </Paper>
 
-                    <RegistrySuggest onChange={this.handleOrganizationChange} selected={data.organization} type={'organization'} />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={this.state.data.disabled}
-                                onChange={(e, checked) => this.setDisabled(checked)}
-                            />
-                        }
-                        label="Disabled"
-                    />
+                            </Grid>
+                            <Grid item xs={0} md={2}/>
+
+
+
+                        </Grid>
+                    </div>
+
 
 
                 </form>

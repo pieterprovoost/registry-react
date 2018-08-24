@@ -22,14 +22,14 @@ function getInstallations(filter, limit, offset) {
 
   var limit = limit || 100;
   var offset = offset || 0;
-  var url = 'http://api.gbif-dev.org/v1/installation?limit=' + limit + "&offset=" + offset;
+  var url = 'http://api.gbif.org/v1/installation?limit=' + limit + "&offset=" + offset;
   if (filter) {
     url += '&' + queryString.stringify(filter);
   }
   return axios(url).then((result) => {
     let promises = [];
     _.each(result.data.results, function (r) {
-      promises.push(axios('http://api.gbif-dev.org/v1/organization/' + r.organizationKey)
+      promises.push(axios('http://api.gbif.org/v1/organization/' + r.organizationKey)
         .then(function (res) {
           r.organization = res.data
         }))
