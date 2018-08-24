@@ -10,42 +10,27 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/Inbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
 
-
-import OrganizationTitle from './organization/OrganizationTitle';
-
 const styles = theme => ({
-  nested: {
-    paddingLeft: theme.spacing.unit * 10,
-  },
+  active: {
+    backgroundColor: theme.palette.action.selected
+  }
 });
 
 class DrawerContent extends Component {
 
   render() {
     const { classes } = this.props;
-
-    let organizationTitle = '';
-    if (this.props.match.params.type === 'organization' && this.props.match.params.key) {
-      organizationTitle = (
-        <List component="div" disablePadding>
-            <ListItem button className={classes.nested}>
-              <OrganizationTitle id={this.props.match.params.key}/>
-            </ListItem>
-          </List>
-      );
-    }
     return (
       <div>
         <Divider />
         <List component="nav">
-          <ListItem button component={NavLink} to={{ pathname: '/organization' }} exact={true} activeClassName="active">
+          <ListItem button component={NavLink} to={{ pathname: '/organization' }} activeClassName={classes.active}>
             <ListItemIcon>
               <InboxIcon />
             </ListItemIcon>
             <ListItemText primary="Publisher" />
           </ListItem>
-          {organizationTitle}
-          <ListItem button component={NavLink} to={{ pathname: '/installation' }} exact={true} activeClassName="active">
+          <ListItem button component={NavLink} to={{ pathname: '/installation' }} activeClassName={classes.active}>
             <ListItemIcon>
               <DraftsIcon />
             </ListItemIcon>

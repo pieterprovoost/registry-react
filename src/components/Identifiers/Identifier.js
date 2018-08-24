@@ -7,18 +7,6 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 
-function TabContainer(props) {
-  return (
-    <Typography component="div" style={{ padding: 8 * 3 }}>
-      {props.children}
-    </Typography>
-  );
-}
-
-TabContainer.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -27,11 +15,7 @@ const styles = theme => ({
   },
 });
 
-const tabs = [
-  'contact', 'endpoint', 'identifier', 'tag', 'comment', 'hosted', 'published', 'installation'
-];
-
-class Organization extends Component {
+class Identifier extends Component {
 
   state = {
     value: this.props.match.params.section || 'root',
@@ -77,8 +61,32 @@ class Organization extends Component {
   }
 }
 
-Organization.propTypes = {
+Identifier.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Organization);
+export default withStyles(styles)(Identifier);
+
+
+/*
+Editable type interface
+Components should
+  update/delete/create themselves, based on a config about url.
+  optional not update, but have a callback for completing the action.
+  Always have  calback for completed actions.
+  Configure which is available (CREATE; UPDATE; DELETE;)
+  Handle edit mode, but option to trigger from props?
+
+Form builder
+  [
+    {
+      displayName, required, regex, component, fields, componentProps
+      //eg firstName, true, null, Input, {}
+      //eg 
+    }
+  ]
+
+https://www.npmjs.com/package/formik er måske værd at se på?
+
+  The form elements should update the state.
+*/
