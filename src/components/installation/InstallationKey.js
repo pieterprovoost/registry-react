@@ -117,7 +117,7 @@ class InstallationKey extends React.Component {
                 <form className={classes.container} noValidate autoComplete="off">
                     <div className={classes.root}>
                         <Grid container spacing={8}>
-                            <Grid item xs={0} md={2}/>
+                            <Grid item xs={false} md={2}/>
                             <Grid item xs={12} md={8}>
                                 <Paper className={classes.paper}>
                                     <TextField
@@ -175,7 +175,7 @@ class InstallationKey extends React.Component {
                                 </Paper>
 
                             </Grid>
-                            <Grid item xs={0} md={2}/>
+                            <Grid item xs={false} md={2}/>
 
 
 
