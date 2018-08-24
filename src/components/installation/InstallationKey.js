@@ -8,6 +8,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import Switch from '@material-ui/core/Switch';
 
 const styles = theme => ({
     root: {
@@ -20,11 +21,11 @@ const styles = theme => ({
         flexWrap: 'wrap',
     },
     textField: {
-       
+
         width: '100%',
     },
     menu: {
-        
+
         width: '100%',
     },
     paper: {
@@ -65,13 +66,9 @@ class InstallationKey extends React.Component {
         var installation;
         axios(`https://api.gbif.org/v1/installation/${key}`)
             .then((result) => {
-                installation = result.data;
-                return axios('http://api.gbif.org/v1/organization/' + result.data.organizationKey)
+                that.setState({ resolved: true, data: result.data })
             })
-            .then(function (res) {
-                installation.organization = res.data
-                that.setState({ resolved: true, data: installation })
-            })
+           
     }
     handleChange = name => event => {
         var data = { ...this.state.data }
@@ -79,17 +76,17 @@ class InstallationKey extends React.Component {
         this.setState({
             data: data,
         });
-        console.log(data)
+       // console.log(data)
     };
 
     handleOrganizationChange = org => {
         var data = { ...this.state.data }
-        data.organization = org
+      //  data.organization = org
         data.organizationKey = org.key
         this.setState({
             data: data,
         });
-        console.log(data)
+       // console.log(data)
     }
     setDisabled = val => {
         var data = { ...this.state.data }
@@ -97,7 +94,7 @@ class InstallationKey extends React.Component {
         this.setState({
             data: data,
         });
-        console.log(data)
+       // console.log(data)
 
     }
     render() {
@@ -117,7 +114,19 @@ class InstallationKey extends React.Component {
                 <form className={classes.container} noValidate autoComplete="off">
                     <div className={classes.root}>
                         <Grid container spacing={8}>
-                            <Grid item xs={false} md={2}/>
+                            <Grid item xs={false} md={2} />
+                            <Grid item xs={12} md={8}><FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={this.state.checkedA}
+                                        onChange={this.handleChange('checkedA')}
+                                        value="checkedA"
+                                    />
+                                }
+                                label="Edit"
+                            /></Grid>
+                            <Grid item xs={false} md={2} />
+                            <Grid item xs={false} md={2} />
                             <Grid item xs={12} md={8}>
                                 <Paper className={classes.paper}>
                                     <TextField
@@ -128,7 +137,7 @@ class InstallationKey extends React.Component {
                                         onChange={this.handleChange('title')}
                                         margin="normal"
                                     />
-                                    <RegistrySuggest onChange={this.handleOrganizationChange} selected={data.organization} type={'organization'} />
+                                    <RegistrySuggest onChange={this.handleOrganizationChange} selectedKey={data.organizationKey} type={'organization'} />
                                     <TextField
                                         id="description"
                                         label="Description"
@@ -175,7 +184,7 @@ class InstallationKey extends React.Component {
                                 </Paper>
 
                             </Grid>
-                            <Grid item xs={false} md={2}/>
+                            <Grid item xs={false} md={2} />
 
 
 

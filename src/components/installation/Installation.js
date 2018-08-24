@@ -44,8 +44,9 @@ function getInstallations(filter, limit, offset) {
 
 const styles = theme => ({
   root: {
-    width: '100%',
-    marginTop: theme.spacing.unit * 3,
+    flexGrow: 1,
+        margin: 20,
+        padding: 20,
   },
   table: {
     minWidth: 500,

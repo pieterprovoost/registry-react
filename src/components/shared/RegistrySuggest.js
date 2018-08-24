@@ -29,7 +29,7 @@ function renderInput(inputProps) {
 
   return (
     <TextField
-    label="Publisher"
+      label="Publisher"
       InputProps={{
         inputRef: ref,
         classes: {
@@ -98,33 +98,54 @@ const styles = theme => ({
 
 
 class RegistrySuggest extends React.Component {
-    constructor(props) {
-      super(props)
-      this.state = {items: []}
-      this.endpoint = baseEndpoint + this.props.type +'?q='
+  constructor(props) {
+    super(props)
+    this.state = { items: [], selected: { key: '', title: '' } }
+    this.endpoint = baseEndpoint + this.props.type + '?q='
+  }
+  componentWillMount() {
+    if (this.props.selectedKey) {
+      axios(baseEndpoint + this.props.type + '/' + this.props.selectedKey).then((result) => {
+        this.setState({ selected: result.data })
+      })
     }
-  
-    fetchRepository = debounce(value => {
-      axios
-        .get(this.endpoint +'*'+ value+'*')
-        .then(response => {
-          const items = response.data.results; 
-          this.setState({items})
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    }, 300)
-  
-    render() {
-        const { classes, onChange, selected, placeholder } = this.props;
-      return (
-        <div className={classes.root}>
+
+  }
+  updateSelected(selectedKey) {
+    axios(baseEndpoint + this.props.type + '/' + selectedKey).then((result) => {
+      this.setState({ selected: result.data })
+    })
+  }
+  componentWillReceiveProps(nextProps) {
+    if (this.props.selectedKey !== nextProps.selectedKey) {
+      this.updateSelected(nextProps.selectedKey);
+    }
+  }
+
+  fetchRepository = debounce(value => {
+    axios
+      .get(this.endpoint + value + '*')
+      .then(response => {
+        const items = response.data.results;
+        this.setState({ items })
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }, 300)
+
+  render() {
+    const { classes, onChange, placeholder } = this.props;
+    const { selected } = this.state;
+    // const { selected } = this.state;
+    console.log(selected)
+    return (
+      <div className={classes.root}>
         <Downshift id="downshift-simple"
-         onChange={onChange}
-         selectedItem={selected}
-         itemToString={item => (item ? item.title : '')}
-         >
+          onChange={onChange}
+          selectedItem={selected}
+          itemToString={item => (item ? item.title : '')}
+        >
           {({ getInputProps, getItemProps, isOpen, selectedItem, highlightedIndex }) => (
             <div className={classes.container}>
               {renderInput({
@@ -132,15 +153,15 @@ class RegistrySuggest extends React.Component {
                 classes,
                 InputProps: getInputProps({
                   placeholder: placeholder || '',
-                      onChange: event => {
-                        const value = event.target.value
-                        if (!value) {
-                          return
-                        }
-                        // call the debounce function
-                        this.fetchRepository(value)
-                      },
-                    
+                  onChange: event => {
+                    const value = event.target.value
+                    if (!value) {
+                      return
+                    }
+                    // call the debounce function
+                    this.fetchRepository(value)
+                  },
+
                 }),
               })}
               {isOpen ? (
@@ -159,14 +180,14 @@ class RegistrySuggest extends React.Component {
             </div>
           )}
         </Downshift>
-  
+
       </div>
-      )
-    }
+    )
   }
+}
 
 
-  RegistrySuggest.propTypes = {
+RegistrySuggest.propTypes = {
   classes: PropTypes.object.isRequired,
   type: PropTypes.oneOf(['dataset', 'organization', 'installation', 'node', 'network']).isRequired,
   onChange: PropTypes.func.isRequired,
