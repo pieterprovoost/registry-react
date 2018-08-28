@@ -6,6 +6,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
+import Installation from '../installation/Installation'
 
 function TabContainer(props) {
   return (
@@ -71,7 +72,7 @@ class Organization extends Component {
         {value === 'comment' && <TabContainer>Comments</TabContainer>}
         {value === 'hosted' && <TabContainer>Hosted datasets</TabContainer>}
         {value === 'published' && <TabContainer>Published datasets</TabContainer>}
-        {value === 'installation' && <TabContainer>Installations</TabContainer>}
+        {value === 'installation' && <TabContainer><Installation endpoint={`organization/${this.props.match.params.organizationKey}/installation`}></Installation></TabContainer>}
       </div>
     );
   }

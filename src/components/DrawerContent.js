@@ -30,6 +30,12 @@ class DrawerContent extends Component {
             </ListItemIcon>
             <ListItemText primary="Publisher" />
           </ListItem>
+          <ListItem button component={NavLink} to={{ pathname: '/dataset' }} activeClassName={classes.active}>
+            <ListItemIcon>
+              <DraftsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Dataset" />
+          </ListItem>
           <ListItem button component={NavLink} to={{ pathname: '/installation' }} activeClassName={classes.active}>
             <ListItemIcon>
               <DraftsIcon />

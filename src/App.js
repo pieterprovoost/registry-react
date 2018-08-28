@@ -5,6 +5,10 @@ import history from './history'
 import Home from './components/Home'
 import Installation from './components/installation/Installation'
 import InstallationKey from './components/installation/InstallationKey'
+import Dataset from './components/dataset/Dataset'
+import DatasetKey from './components/dataset/DatasetKey'
+
+
 import OrganizationSearch from './components/organization/OrganizationSearch'
 import Organization from './components/organization/Organization'
 import DrawerContent from './components/DrawerContent'
@@ -141,7 +145,9 @@ class App extends Component {
                 <Route path="/organization" render={(props) => <OrganizationSearch />} exact />
                 <Route path="/organization/:organizationKey/:section?" component={Organization} />
                 <Route path="/installation/:key" component={InstallationKey} />
+                <Route path="/dataset/:key" component={DatasetKey} />
                 <Route exact path="/installation" render={(props) => <Installation />} />
+                <Route exact path="/dataset" render={(props) => <Dataset />} />
                 <Route component={NoMatch} />
               </Switch>
             </main>

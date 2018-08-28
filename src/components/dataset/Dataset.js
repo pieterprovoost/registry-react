@@ -23,7 +23,7 @@ function getInstallations(filter, limit, offset, endpoint) {
 
   var limit = limit || 100;
   var offset = offset || 0;
-  var url = (endpoint) ? `${baseEndpoint}${endpoint}`: `${baseEndpoint}installation?limit=${limit}&offset=${offset}`;
+  var url = (endpoint) ? `${baseEndpoint}${endpoint}`: `${baseEndpoint}dataset?limit=${limit}&offset=${offset}`;
  // var url = 'http://api.gbif.org/v1/''installation?limit=' + limit + "&offset=" + offset;
   if (filter && !endpoint) {
     url += '&' + queryString.stringify(filter);
@@ -31,7 +31,7 @@ function getInstallations(filter, limit, offset, endpoint) {
   return axios(url).then((result) => {
     let promises = [];
     _.each(result.data.results, function (r) {
-      promises.push(axios('http://api.gbif.org/v1/organization/' + r.organizationKey)
+      promises.push(axios('http://api.gbif.org/v1/organization/' + r.publishingOrganizationKey)
         .then(function (res) {
           r.organization = res.data
         }))
@@ -114,7 +114,7 @@ class Installation extends React.Component {
           <Table className={classes.table}>
             <TableHead>
               <TableRow key={1}>
-                {['Installation', 'Organization', 'Created', 'Modified'].map((n, i) => {
+                {['Dataset', 'Organization', 'Created', 'Modified'].map((n, i) => {
                   return (<TableCell key={i}>{n}</TableCell>);
                 })}
               </TableRow>
@@ -124,7 +124,7 @@ class Installation extends React.Component {
                 return (
                   <TableRow key={n.key}>
                     <TableCell component="th" scope="row">
-                      <NavLink to={{ pathname: '/installation/'+n.key}} exact={true} activeClassName="active">{n.title}</NavLink>
+                      <NavLink to={{ pathname: '/dataset/'+n.key}} exact={true} activeClassName="active">{n.title}</NavLink>
 
                     </TableCell>
                     <TableCell>{n.organization.title}</TableCell>

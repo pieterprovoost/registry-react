@@ -137,8 +137,7 @@ class RegistrySuggest extends React.Component {
   render() {
     const { classes, onChange, placeholder } = this.props;
     const { selected } = this.state;
-    // const { selected } = this.state;
-    console.log(selected)
+   
     return (
       <div className={classes.root}>
         <Downshift id="downshift-simple"
@@ -151,6 +150,7 @@ class RegistrySuggest extends React.Component {
               {renderInput({
                 fullWidth: true,
                 classes,
+                label:placeholder,
                 InputProps: getInputProps({
                   placeholder: placeholder || '',
                   onChange: event => {
