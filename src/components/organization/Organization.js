@@ -7,6 +7,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Installation from '../installation/Installation'
+import RegistryForm from '../shared/RegistryForm'
+
 
 function TabContainer(props) {
   return (
@@ -23,10 +25,53 @@ TabContainer.propTypes = {
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    width: '100%',
-    backgroundColor: theme.palette.background.paper,
+    width: '100%'
   },
 });
+
+const config = {
+  "name": "organization",
+  "schema": [
+      {
+          field: "title",
+          type: "text",
+          editable: true
+      },
+      {
+        field: "address",
+        type: "textArray",
+        editable: true
+      },
+      {
+          field: "endorsingNodeKey",
+          type: "relation",
+          name: "node",
+          editable: true
+      },
+      {
+          field: "description",
+          type: "text",
+          multiline: true,
+          editable: true
+      },
+      {
+        field: "email",
+        type: "textArray",
+        editable: true
+      },
+      {
+        field: "homepage",
+        type: "textArray",
+        editable: true
+      },
+      {
+          field: "country",
+          type: "enum",
+          name: "Country",
+          editable: true
+      }
+  ]
+}
 
 const tabs = [
   'contact', 'endpoint', 'identifier', 'tag', 'comment', 'hosted', 'published', 'installation'
@@ -64,7 +109,7 @@ class Organization extends Component {
             {tabElements}
           </Tabs>
         </AppBar>
-        {value === 'root' && <TabContainer>Publisher {this.state.value} </TabContainer>}
+        {value === 'root' && <TabContainer><RegistryForm config={config}  path={`${config.name}/${this.props.match.params.organizationKey}`}></RegistryForm> </TabContainer>}
         {value === 'contact' && <TabContainer>Contacts {this.state.value}</TabContainer>}
         {value === 'endpoint' && <TabContainer>Endpoints</TabContainer>}
         {value === 'identifier' && <TabContainer>Identifiers</TabContainer>}

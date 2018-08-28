@@ -131,6 +131,8 @@ class RegistryForm extends React.Component {
             case "textArray": {
                 return <ChipInput
                 key={config.field}
+                fullWidth={true}
+                label={`${config.field}(s)`}
                 value={this.state.data[config.field]}
                 onAdd={(chip) => this.handleAddChip(chip, config.field)}
                 onDelete={(chip, index) => this.handleDeleteChip(chip, index, config.field)}
