@@ -1,44 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import IconButton from '@material-ui/core/IconButton';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import axios from 'axios';
-import moment from 'moment';
-import DeleteIcon from '@material-ui/icons/Delete';
 import Button from '@material-ui/core/Button';
 import RegistryForm from '../shared/RegistryForm'
+import NestedPropertyList from '../shared/NestedPropertyList'
 const baseEndpoint = 'https://api.gbif.org/v1/';
 
 
 const styles = theme => ({
-  root: {
-    flexGrow: 1,
-    width: '100%',
-  },
-});
-const config = {
-  name: "identifier",
-  schema: [
-    {
-      field: "identifier",
-      type: "text",
-      editable: true
+    root: {
+        flexGrow: 1,
+        margin: 20,
+        padding: 20,
     },
-    {
-      field: "type",
-      type: "enum",
-      name: "IdentifierType",
-      editable: true
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
     }
-  ]
-}
-class Identifier extends React.Component {
+});
+
+class NestedPropertyPage extends React.Component {
 
   constructor(props) {
     super(props);
@@ -63,11 +47,11 @@ class Identifier extends React.Component {
       })
 
   }
-  toggleForm (){
-    this.setState({showForm: !this.state.showForm})
+  toggleForm() {
+    this.setState({ showForm: !this.state.showForm })
   }
   render() {
-    const { classes, path } = this.props;
+    const { classes, path, config } = this.props;
     const { data, showForm } = this.state;
     return (
       <div className={classes.root}>
@@ -78,30 +62,17 @@ class Identifier extends React.Component {
             direction="row"
             justify="flex-end"
             alignItems="center">
-            {!showForm &&<Button variant="contained" color="primary" className={classes.button} onClick={this.toggleForm}>Add new</Button>}
+            {!showForm && <Button variant="contained" color="primary" className={classes.button} onClick={this.toggleForm}>Add new</Button>}
           </Grid>
           <Grid item xs={false} md={2} />
           <Grid item xs={false} md={2} />
           <Grid item xs={12} md={8}>
-          {showForm && <RegistryForm config={config} path={path}></RegistryForm>}
+            {showForm && <RegistryForm config={config} path={path} onCancel={this.toggleForm}></RegistryForm>}
           </Grid><Grid item xs={false} md={2} />
           <Grid item xs={false} md={2} />
           <Grid item xs={12} md={8}>
             <Paper className={classes.paper}>
-              <List>
-                {data.map(elm => {
-                  return <ListItem key={elm.key}>
-                    <ListItemText primary={`${elm.identifier} (${elm.type})`} secondary={`Created ${moment(elm.createdAt).format('LL')} by ${elm.createdBy}`} />
-                    <ListItemSecondaryAction>
-                      <IconButton aria-label="Delete">
-                        <DeleteIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                })}
-
-              </List>
-
+              <NestedPropertyList data={data} config={config}></NestedPropertyList>
             </Paper>
 
           </Grid>
@@ -112,11 +83,11 @@ class Identifier extends React.Component {
   }
 }
 
-Identifier.propTypes = {
+NestedPropertyPage.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Identifier);
+export default withStyles(styles)(NestedPropertyPage);
 
 
 /*

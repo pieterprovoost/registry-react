@@ -1,8 +1,4 @@
-import React from 'react';
-import RegistryForm from '../shared/RegistryForm'
-import RegistryFormWrapper from '../shared/RegistryFormWrapper'
-
-const config = {
+module.exports = {
     "name": "installation",
     "schema": [
         {
@@ -33,22 +29,8 @@ const config = {
             type: "boolean",
             editable: true
         },
-    ]
-}
-
-class InstallationKey extends React.Component {
-
-    render() {
-        const { match: { params: { key } } } = this.props;
-        return (
-            <RegistryFormWrapper>
-                <RegistryForm config={config} path={config.name} id={key}></RegistryForm>
-            </RegistryFormWrapper>
-        )
-    }
-
+    ],
+    nested: ['contact', 'endpoint', 'identifier', 'tag', 'machineTag', 'comment'],
+    relations: ['dataset']
 
 }
-
-
-export default InstallationKey;

@@ -14,7 +14,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Button from '@material-ui/core/Button';
 
-const baseEndpoint = 'https://api.gbif.org/v1/';
+const baseEndpoint = require('../../config/config').dataApi;
 
 const styles = theme => ({
     root: {
@@ -81,10 +81,15 @@ class RegistryForm extends React.Component {
     };
 
     exitEditMode = () => {
+       if(this.props.id){
         this.getData();
         this.setState({
             editMode: false,
         });
+       }
+       if(this.props.onCancel){
+        this.props.onCancel()
+       }
     }
 
     handleChange = name => event => {
@@ -144,6 +149,8 @@ class RegistryForm extends React.Component {
                     multiline={config.multiline || false}
                     margin="normal"
                     disabled={!editMode}
+                    helperText={config.helperText}
+
                 />
             }
             case "textArray": {

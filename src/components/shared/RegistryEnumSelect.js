@@ -7,7 +7,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 const ENUM_TYPES = require('../../enums/enumTypes.json');
 
-const baseEndpoint = 'http://api.gbif.org/v1/enumeration/basic/'
+const baseEndpoint = `${require('../../config/config').dataApi}enumeration/basic/`
+
 const styles = theme => ({
 
     textField: {
@@ -39,6 +40,8 @@ class RegistryEnumSelect extends React.Component {
         const { type } = this.props;
         axios(`${baseEndpoint}${type}`).then((result) => {
             this.setState({ types: result.data, resolved: true })
+        }).catch(function(err){
+            console.log(err)
         })
     }
 

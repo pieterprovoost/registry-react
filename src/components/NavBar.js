@@ -46,7 +46,7 @@ const styles = theme => ({
 
 function ClippedDrawer(props) {
     const { classes } = props;
-
+    const mainEntities = ['dataset', 'organization', 'installation']
     return (
         <div className={classes.root}>
             <AppBar position="absolute" className={classes.appBar}>
@@ -64,18 +64,14 @@ function ClippedDrawer(props) {
             >
                 <div className={classes.toolbar} />
                 <List component="nav">
-                    <ListItem button component={NavLink} to={{ pathname: '/dataset'}} exact={true} activeClassName="active">
-                        <ListItemIcon>
-                            <InboxIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Dataset" />
-                    </ListItem>
-                    <ListItem button component={NavLink} to={{ pathname: '/installation'}} exact={true} activeClassName="active">
+                    {mainEntities.map(function(entity){
+                        return <ListItem button component={NavLink} to={{ pathname: '/'+entity}} exact={true} activeClassName="active">
                         <ListItemIcon>
                             <DraftsIcon />
                         </ListItemIcon>
-                        <ListItemText primary="Installation" />
+                        <ListItemText primary={entity} />
                     </ListItem>
+                    })}
                 </List>
                 <Divider />
                 <List component="nav">

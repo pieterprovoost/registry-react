@@ -3,14 +3,9 @@ import { Router, Route, Switch } from "react-router-dom";
 import history from './history'
 
 import Home from './components/Home'
-import Installation from './components/installation/Installation'
-import InstallationKey from './components/installation/InstallationKey'
-import Dataset from './components/dataset/Dataset'
-import DatasetKey from './components/dataset/DatasetKey'
+import EntityPage from './components/shared/EntityPage'
+import EntitylistPage from './components/shared/EntityListPage'
 
-
-import OrganizationSearch from './components/organization/OrganizationSearch'
-import Organization from './components/organization/Organization'
 import DrawerContent from './components/DrawerContent'
 
 import './App.css';
@@ -89,7 +84,7 @@ class App extends Component {
 
   render() {
     const { classes } = this.props;
-
+    const mainEntities = ['dataset', 'organization', 'installation']
     return (
       <Router history={history}>
         <MuiThemeProvider theme={theme}>
@@ -140,14 +135,14 @@ class App extends Component {
               <div className={classes.toolbar} />
               <Switch>
                 <Route exact path="/" render={(props) => <Home />} />
-                <Route exact path="/test" render={(props) => <Home />} />
-                <Route exact path="/test/test" render={(props) => <Home />} />
-                <Route path="/organization" render={(props) => <OrganizationSearch />} exact />
-                <Route path="/organization/:organizationKey/:section?" component={Organization} />
-                <Route path="/installation/:key" component={InstallationKey} />
-                <Route path="/dataset/:key" component={DatasetKey} />
-                <Route exact path="/installation" render={(props) => <Installation />} />
-                <Route exact path="/dataset" render={(props) => <Dataset />} />
+
+                {mainEntities.map(function(entity){
+                  return <Route exact key={`${entity}Key`} path={`/${entity}/:key/:section?`} component={EntityPage} />
+                })}
+                {mainEntities.map(function(entity){
+                  return <Route exact key={entity} path={`/${entity}`} render={(props) => <EntitylistPage path={entity} />} />
+                })}
+
                 <Route component={NoMatch} />
               </Switch>
             </main>

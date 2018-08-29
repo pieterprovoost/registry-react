@@ -17,38 +17,14 @@ import { NavLink } from "react-router-dom";
 
 const _ = require('lodash')
 
-const baseEndpoint = 'https://api.gbif.org/v1/';
-
-function getInstallations(filter, limit, offset, endpoint) {
-
-  var limit = limit || 100;
-  var offset = offset || 0;
-  var url = (endpoint) ? `${baseEndpoint}${endpoint}`: `${baseEndpoint}dataset?limit=${limit}&offset=${offset}`;
- // var url = 'http://api.gbif.org/v1/''installation?limit=' + limit + "&offset=" + offset;
-  if (filter && !endpoint) {
-    url += '&' + queryString.stringify(filter);
-  }
-  return axios(url).then((result) => {
-    let promises = [];
-    _.each(result.data.results, function (r) {
-      promises.push(axios('http://api.gbif.org/v1/organization/' + r.publishingOrganizationKey)
-        .then(function (res) {
-          r.organization = res.data
-        }))
-    })
-    return Promise.all(promises).then(function () {
-      return result;
-    })
-  })
-
-}
+const baseEndpoint = require('../../config/config').dataApi;
 
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
-        margin: 20,
-        padding: 20,
+    margin: 20,
+    padding: 20,
   },
   table: {
     minWidth: 500,
@@ -58,7 +34,7 @@ const styles = theme => ({
   },
 });
 
-class Installation extends React.Component {
+class EntityListPage extends React.Component {
   constructor(props) {
     super(props);
     this.getData = this.getData.bind(this);
@@ -83,14 +59,44 @@ class Installation extends React.Component {
 
   componentWillMount() {
     this.getData()
-
-    // this.getOccurrences(this.state.rowsPerPage, this.state.page)
+  }
+  componentWillReceiveProps(nextProps) {
+    if (this.props.path !== nextProps.path) {
+      this.setState({
+        data: [],
+        page: 0,
+        offset: 0,
+        rowsPerPage: 25,
+        rowsPerPageOptions: [25, 50, 100],
+        count: 0
+      }, this.getData);
+    }
   }
 
   getData() {
     const that = this;
-    const { endpoint } = this.props;
-    getInstallations({}, this.state.rowsPerPage, this.state.page * this.state.rowsPerPage, endpoint)
+    const { endpoint, path } = this.props;
+    const { offset, rowsPerPage, filter, page } = this.state;
+    var url = (endpoint) ? `${baseEndpoint}${endpoint}` : `${baseEndpoint}${path}?limit=${rowsPerPage}&offset=${rowsPerPage * page}`;
+
+    if (filter && !endpoint) {
+      url += '&' + queryString.stringify(filter);
+    }
+    axios(url).then((result) => {
+      let promises = [];
+      _.each(result.data.results, function (r) {
+        let key = (path === 'installation') ? 'organizationKey' : 'publishingOrganizationKey'
+        promises.push(axios(`${baseEndpoint}organization/` + r[key])
+          .then(function (res) {
+            r.organization = res.data
+          }))
+      })
+      return Promise.all(promises).then(function () {
+        return result;
+      }).catch(function(){
+        return result
+      })
+    })
       .then(function (res) {
         that.setState({
           data: res.data.results,
@@ -103,10 +109,12 @@ class Installation extends React.Component {
       })
   }
 
-  
+
   render() {
-    const { classes } = this.props;
+    const { classes, path } = this.props;
     const { data, rowsPerPage, page, count, rowsPerPageOptions } = this.state;
+    const hasOrganization = (path === 'installation' || path === 'dataset')
+    const columns = (hasOrganization) ?  [path, 'organization', 'created', 'modified'] : [path,  'created', 'modified'];
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, count - page * rowsPerPage);
     return (
       <Paper className={classes.root}>
@@ -114,7 +122,7 @@ class Installation extends React.Component {
           <Table className={classes.table}>
             <TableHead>
               <TableRow key={1}>
-                {['Dataset', 'Organization', 'Created', 'Modified'].map((n, i) => {
+                {columns.map((n, i) => {
                   return (<TableCell key={i}>{n}</TableCell>);
                 })}
               </TableRow>
@@ -124,10 +132,10 @@ class Installation extends React.Component {
                 return (
                   <TableRow key={n.key}>
                     <TableCell component="th" scope="row">
-                      <NavLink to={{ pathname: '/dataset/'+n.key}} exact={true} activeClassName="active">{n.title}</NavLink>
+                      <NavLink to={{ pathname: `/${path}/${n.key}`}} exact={true} activeClassName="active">{n.title}</NavLink>
 
                     </TableCell>
-                    <TableCell>{n.organization.title}</TableCell>
+                    {hasOrganization && <TableCell><NavLink to={{ pathname: `/organization/${n.organization.key}`}} exact={true} activeClassName="active">{n.organization.title}</NavLink></TableCell>}
                     <TableCell><Moment format="LL">{n.created}</Moment></TableCell>
                     <TableCell ><Moment format="LL">{n.modified}</Moment></TableCell>
                   </TableRow>
@@ -160,8 +168,9 @@ class Installation extends React.Component {
   }
 }
 
-Installation.propTypes = {
+EntityListPage.propTypes = {
+  path: PropTypes.oneOf(['dataset', 'organization', 'installation', 'node', 'hostedDataset', 'publishedDataset', 'constituents']).isRequired,
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Installation);
+export default withStyles(styles)(EntityListPage);
