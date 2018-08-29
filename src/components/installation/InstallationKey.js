@@ -1,5 +1,6 @@
 import React from 'react';
 import RegistryForm from '../shared/RegistryForm'
+import RegistryFormWrapper from '../shared/RegistryFormWrapper'
 
 const config = {
     "name": "installation",
@@ -40,7 +41,9 @@ class InstallationKey extends React.Component {
     render() {
         const { match: { params: { key } } } = this.props;
         return (
-            <RegistryForm config={config}  path={`${config.name}/${key}`}></RegistryForm>
+            <RegistryFormWrapper>
+                <RegistryForm config={config} path={config.name} id={key}></RegistryForm>
+            </RegistryFormWrapper>
         )
     }
 

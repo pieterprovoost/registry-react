@@ -1,61 +1,112 @@
-import React, { Component } from 'react';
-import { NavLink } from "react-router-dom";
+import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import IconButton from '@material-ui/core/IconButton';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import axios from 'axios';
+import moment from 'moment';
+import DeleteIcon from '@material-ui/icons/Delete';
+import Button from '@material-ui/core/Button';
+import RegistryForm from '../shared/RegistryForm'
+const baseEndpoint = 'https://api.gbif.org/v1/';
+
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
     width: '100%',
-    backgroundColor: theme.palette.background.paper,
   },
 });
+const config = {
+  name: "identifier",
+  schema: [
+    {
+      field: "identifier",
+      type: "text",
+      editable: true
+    },
+    {
+      field: "type",
+      type: "enum",
+      name: "IdentifierType",
+      editable: true
+    }
+  ]
+}
+class Identifier extends React.Component {
 
-class Identifier extends Component {
+  constructor(props) {
+    super(props);
+    this.getData = this.getData.bind(this);
+    this.toggleForm = this.toggleForm.bind(this);
+    this.state = {
+      resolved: false,
+      data: [],
+      showForm: false
+    };
 
-  state = {
-    value: this.props.match.params.section || 'root',
-  };
+  }
+  componentWillMount() {
+    this.getData()
+  }
+  getData() {
+    var that = this;
+    const { path } = this.props;
+    axios(`${baseEndpoint}${path}`)
+      .then((result) => {
+        that.setState({ resolved: true, data: result.data })
+      })
 
-  handleChange = (event, value) => {
-    this.setState({ value });
-  };
-
+  }
+  toggleForm (){
+    this.setState({showForm: !this.state.showForm})
+  }
   render() {
-    const { classes } = this.props;
-    const { value } = this.state;
-
-    const tabElements = tabs.map(name => {
-      return <Tab key={name} value={name} label={name} to={ `/organization/${this.props.match.params.organizationKey}/${name}`} component={NavLink} />
-    });
+    const { classes, path } = this.props;
+    const { data, showForm } = this.state;
     return (
       <div className={classes.root}>
-        <AppBar position="static" color="default">
-          <Tabs
-            value={value}
-            onChange={this.handleChange}
-            indicatorColor="primary"
-            textColor="primary"
-            scrollable
-            scrollButtons="auto"
-          >
-            <Tab value="root" label="Publisher" to={ `/organization/${this.props.match.params.organizationKey}`} component={NavLink} />
-            {tabElements}
-          </Tabs>
-        </AppBar>
-        {value === 'root' && <TabContainer>Publisher {this.state.value} </TabContainer>}
-        {value === 'contact' && <TabContainer>Contacts {this.state.value}</TabContainer>}
-        {value === 'endpoint' && <TabContainer>Endpoints</TabContainer>}
-        {value === 'identifier' && <TabContainer>Identifiers</TabContainer>}
-        {value === 'tag' && <TabContainer>Machine tags</TabContainer>}
-        {value === 'comment' && <TabContainer>Comments</TabContainer>}
-        {value === 'hosted' && <TabContainer>Hosted datasets</TabContainer>}
-        {value === 'published' && <TabContainer>Published datasets</TabContainer>}
-        {value === 'installation' && <TabContainer>Installations</TabContainer>}
+        <Grid container spacing={8}>
+          <Grid item xs={false} md={2} />
+          <Grid item xs={12} md={8}
+            container
+            direction="row"
+            justify="flex-end"
+            alignItems="center">
+            {!showForm &&<Button variant="contained" color="primary" className={classes.button} onClick={this.toggleForm}>Add new</Button>}
+          </Grid>
+          <Grid item xs={false} md={2} />
+          <Grid item xs={false} md={2} />
+          <Grid item xs={12} md={8}>
+          {showForm && <RegistryForm config={config} path={path}></RegistryForm>}
+          </Grid><Grid item xs={false} md={2} />
+          <Grid item xs={false} md={2} />
+          <Grid item xs={12} md={8}>
+            <Paper className={classes.paper}>
+              <List>
+                {data.map(elm => {
+                  return <ListItem key={elm.key}>
+                    <ListItemText primary={`${elm.identifier} (${elm.type})`} secondary={`Created ${moment(elm.createdAt).format('LL')} by ${elm.createdBy}`} />
+                    <ListItemSecondaryAction>
+                      <IconButton aria-label="Delete">
+                        <DeleteIcon />
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                })}
+
+              </List>
+
+            </Paper>
+
+          </Grid>
+          <Grid item xs={false} md={2} />
+        </Grid>
       </div>
     );
   }

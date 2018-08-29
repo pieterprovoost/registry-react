@@ -8,7 +8,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Installation from '../installation/Installation'
 import RegistryForm from '../shared/RegistryForm'
-
+import Indentifier from '../Identifiers/Identifier'
 
 function TabContainer(props) {
   return (
@@ -32,44 +32,67 @@ const styles = theme => ({
 const config = {
   "name": "organization",
   "schema": [
-      {
-          field: "title",
-          type: "text",
+    {
+      field: "title",
+      type: "text",
+      editable: true
+    },
+    {
+      field: "address",
+      type: "textArray",
+      editable: true
+    },
+    {
+      field: "endorsingNodeKey",
+      type: "relation",
+      name: "node",
+      editable: true
+    },
+    {
+      field: "description",
+      type: "text",
+      multiline: true,
+      editable: true
+    },
+    {
+      field: "email",
+      type: "textArray",
+      editable: true
+    },
+    {
+      field: "homepage",
+      type: "textArray",
+      editable: true
+    },
+    {
+      field: "country",
+      type: "enum",
+      name: "Country",
+      editable: true
+    }
+  ],
+  nestedSchemas: [
+    {
+      name: "endpoint",
+      schema: [
+        {
+          field: "type",
+          type: "enum",
+          name: "EndpointType",
           editable: true
-      },
-      {
-        field: "address",
-        type: "textArray",
-        editable: true
-      },
-      {
-          field: "endorsingNodeKey",
-          type: "relation",
-          name: "node",
-          editable: true
-      },
-      {
+        },
+        {
           field: "description",
           type: "text",
-          multiline: true,
           editable: true
-      },
-      {
-        field: "email",
-        type: "textArray",
-        editable: true
-      },
-      {
-        field: "homepage",
-        type: "textArray",
-        editable: true
-      },
-      {
-          field: "country",
-          type: "enum",
-          name: "Country",
+        },
+        {
+          field: "url",
+          type: "text",
           editable: true
-      }
+        }
+      ]
+    }
   ]
 }
 
@@ -92,7 +115,7 @@ class Organization extends Component {
     const { value } = this.state;
 
     const tabElements = tabs.map(name => {
-      return <Tab key={name} value={name} label={name} to={ `/organization/${this.props.match.params.organizationKey}/${name}`} component={NavLink} />
+      return <Tab key={name} value={name} label={name} to={`/organization/${this.props.match.params.organizationKey}/${name}`} component={NavLink} />
     });
     return (
       <div className={classes.root}>
@@ -105,14 +128,14 @@ class Organization extends Component {
             scrollable
             scrollButtons="auto"
           >
-            <Tab value="root" label="Publisher" to={ `/organization/${this.props.match.params.organizationKey}`} component={NavLink} />
+            <Tab value="root" label="Publisher" to={`/organization/${this.props.match.params.organizationKey}`} component={NavLink} />
             {tabElements}
           </Tabs>
         </AppBar>
-        {value === 'root' && <TabContainer><RegistryForm config={config}  path={`${config.name}/${this.props.match.params.organizationKey}`}></RegistryForm> </TabContainer>}
+        {value === 'root' && <TabContainer><RegistryForm config={config} path={`${config.name}/${this.props.match.params.organizationKey}`}></RegistryForm> </TabContainer>}
         {value === 'contact' && <TabContainer>Contacts {this.state.value}</TabContainer>}
         {value === 'endpoint' && <TabContainer>Endpoints</TabContainer>}
-        {value === 'identifier' && <TabContainer>Identifiers</TabContainer>}
+        {value === 'identifier' && <TabContainer><Indentifier path={`organization/${this.props.match.params.organizationKey}/identifier`}></Indentifier></TabContainer>}
         {value === 'tag' && <TabContainer>Machine tags</TabContainer>}
         {value === 'comment' && <TabContainer>Comments</TabContainer>}
         {value === 'hosted' && <TabContainer>Hosted datasets</TabContainer>}

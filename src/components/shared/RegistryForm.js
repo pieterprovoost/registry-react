@@ -12,14 +12,13 @@ import Switch from '@material-ui/core/Switch';
 import ChipInput from 'material-ui-chip-input'
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
+import Button from '@material-ui/core/Button';
 
 const baseEndpoint = 'https://api.gbif.org/v1/';
 
 const styles = theme => ({
     root: {
-        flexGrow: 1,
-        margin: 20,
-        padding: 20,
+        flexGrow: 1
     },
     container: {
         display: 'flex',
@@ -40,6 +39,9 @@ const styles = theme => ({
         padding: theme.spacing.unit * 2,
         color: theme.palette.text.secondary,
     },
+    button: {
+        margin: theme.spacing.unit,
+    }
 });
 
 
@@ -49,27 +51,42 @@ class RegistryForm extends React.Component {
         super(props);
         this.getData = this.getData.bind(this);
         this.getFormField = this.getFormField.bind(this);
+        let editMode = !this.props.id
         this.state = {
-            resolved: false
+            resolved: !this.props.id,
+            editMode: editMode,
+            data: {}
         };
 
     }
 
     componentWillMount() {
-
+       if(this.props.id){
         this.getData()
-
+       } 
     }
 
     getData() {
         var that = this;
-        const { path } = this.props;
-        axios(`${baseEndpoint}${path}`)
+        const { path, id } = this.props;
+        axios(`${baseEndpoint}${path}/${id}`)
             .then((result) => {
                 that.setState({ resolved: true, data: result.data })
             })
-
     }
+    setEditMode = enabled => {
+        this.setState({
+            editMode: enabled,
+        });
+    };
+
+    exitEditMode = () => {
+        this.getData();
+        this.setState({
+            editMode: false,
+        });
+    }
+
     handleChange = name => event => {
         var data = { ...this.state.data }
         data[name] = event.target.value
@@ -94,27 +111,27 @@ class RegistryForm extends React.Component {
         this.setState({
             data: data,
         });
-         console.log(data)
+        console.log(data)
     }
     handleAddChip = (val, field) => {
         var data = { ...this.state.data }
-        data[field].push(val); 
+        data[field].push(val);
         this.setState({
             data: data,
         });
-         console.log(data)
+        console.log(data)
     }
     handleDeleteChip = (val, index, field) => {
         var data = { ...this.state.data }
-        data[field].splice(index,1); 
+        data[field].splice(index, 1);
         this.setState({
             data: data,
         });
-         console.log(data)
+        console.log(data)
     }
     getFormField(config) {
         const { classes } = this.props;
-        const { data } = this.state;
+        const { data, editMode } = this.state;
         switch (config.type) {
             case "text": {
                 return <TextField
@@ -126,23 +143,38 @@ class RegistryForm extends React.Component {
                     onChange={this.handleChange(config.field)}
                     multiline={config.multiline || false}
                     margin="normal"
+                    disabled={!editMode}
                 />
             }
             case "textArray": {
                 return <ChipInput
-                key={config.field}
-                fullWidth={true}
-                label={`${config.field}(s)`}
-                value={this.state.data[config.field]}
-                onAdd={(chip) => this.handleAddChip(chip, config.field)}
-                onDelete={(chip, index) => this.handleDeleteChip(chip, index, config.field)}
-              />
+                    key={config.field}
+                    fullWidth={true}
+                    label={`${config.field}(s)`}
+                    value={this.state.data[config.field]}
+                    onAdd={(chip) => this.handleAddChip(chip, config.field)}
+                    onDelete={(chip, index) => this.handleDeleteChip(chip, index, config.field)}
+                    disabled={!editMode}
+                />
             }
             case "relation": {
-                return <RegistrySuggest key={config.field} onChange={selectedItem => this.handleRelationChange(selectedItem, config.field)} selectedKey={data[config.field]} type={config.name} placeholder={config.field} />
+                return <RegistrySuggest
+                    key={config.field}
+                    onChange={selectedItem => this.handleRelationChange(selectedItem, config.field)}
+                    selectedKey={data[config.field]}
+                    type={config.name}
+                    placeholder={config.field}
+                    disabled={!editMode} />
             }
             case "enum": {
-                return <RegistryEnumSelect key={config.field} value={data[config.field]} type={config.name} onChange={this.handleChange(config.field)} label={config.field} helperText={config.helperText}/>
+                return <RegistryEnumSelect
+                    key={config.field}
+                    value={data[config.field]}
+                    type={config.name}
+                    onChange={this.handleChange(config.field)}
+                    label={config.field}
+                    helperText={config.helperText}
+                    disabled={!editMode} />
             }
             case "boolean": {
                 return <FormControl key={`${config.field}_control`}><FormControlLabel
@@ -151,17 +183,18 @@ class RegistryForm extends React.Component {
                         <Checkbox
                             checked={this.state.data[config.field]}
                             onChange={(e, checked) => this.setBoolean(checked, config.field)}
+                            disabled={!editMode}
                         />
                     }
                     label={config.field}
                 />
-                {config.helperText && <FormHelperText key={`${config.field}_help`} className={classes.checkBoxHelperText}>{config.helperText}</FormHelperText>}
+                    {config.helperText && <FormHelperText key={`${config.field}_help`} className={classes.checkBoxHelperText}>{config.helperText}</FormHelperText>}
                 </FormControl>
             }
         }
     }
     render() {
-        const { resolved } = this.state;
+        const { resolved, editMode } = this.state;
         const { classes } = this.props;
 
         if (!resolved) {
@@ -172,34 +205,38 @@ class RegistryForm extends React.Component {
             )
         } else {
 
-            const { config } = this.props;
+            const { config, id } = this.props;
             const formElements = config.schema.map(this.getFormField);
             return (
-                <form className={classes.container} noValidate autoComplete="off">
-                    <div className={classes.root}>
-                        <Grid container spacing={8}>
-                            <Grid item xs={false} md={2} />
-                            <Grid item xs={12} md={8}><FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={this.state.checkedA}
-                                        onChange={this.handleChange('checkedA')}
-                                        value="checkedA"
-                                    />
-                                }
-                                label="Edit"
-                            /></Grid>
-                            <Grid item xs={false} md={2} />
-                            <Grid item xs={false} md={2} />
-                            <Grid item xs={12} md={8}>
-                                <Paper className={classes.paper}>
-                                    {formElements}
-                                </Paper>
+                <form className={classes.root} noValidate autoComplete="off">
+                    <Grid>
+                      { id && <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={this.state.editMode}
+                                    onChange={(e, checked) => this.setEditMode(checked)}
+                                />
+                            }
+                            label="Edit"
+                        />}
+                        <Paper className={classes.paper}>
 
-                            </Grid>
-                            <Grid item xs={false} md={2} />
-                        </Grid>
-                    </div>
+                            {formElements}
+                            {editMode && <Grid
+                                container
+                                direction="row"
+                                justify="flex-end"
+                                alignItems="center"
+                            >
+                                <Button variant="contained" className={classes.button} onClick={this.exitEditMode}>
+                                    Cancel
+                                        </Button>
+                                <Button variant="contained" color="primary" className={classes.button}>
+                                    Submit
+                                        </Button></Grid>}
+
+                        </Paper>
+                    </Grid>
                 </form>
             )
         }

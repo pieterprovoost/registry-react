@@ -44,7 +44,7 @@ class RegistryEnumSelect extends React.Component {
 
     render() {
         const { resolved, types } = this.state;
-        const { classes, onChange, value, label, helperText } = this.props;
+        const { classes, onChange, value, label, helperText, disabled } = this.props;
 
         if (!resolved) {
             return (
@@ -62,6 +62,7 @@ class RegistryEnumSelect extends React.Component {
                     className={classes.textField}
                     value={value || ""}
                     onChange={onChange}
+                    disabled={disabled}
                     SelectProps={{
                         MenuProps: {
                             className: classes.menu,

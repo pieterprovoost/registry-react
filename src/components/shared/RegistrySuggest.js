@@ -135,7 +135,7 @@ class RegistrySuggest extends React.Component {
   }, 300)
 
   render() {
-    const { classes, onChange, placeholder } = this.props;
+    const { classes, onChange, placeholder, disabled } = this.props;
     const { selected } = this.state;
    
     return (
@@ -153,6 +153,7 @@ class RegistrySuggest extends React.Component {
                 label:placeholder,
                 InputProps: getInputProps({
                   placeholder: placeholder || '',
+                  disabled: disabled,
                   onChange: event => {
                     const value = event.target.value
                     if (!value) {
