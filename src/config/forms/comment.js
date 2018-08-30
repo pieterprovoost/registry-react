@@ -1,5 +1,6 @@
 module.exports = {
     name: "tag",
+    updatable: false,
     schema: [
       {
         field: "content",

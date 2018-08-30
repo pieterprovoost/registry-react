@@ -1,5 +1,6 @@
 module.exports = {
     name: "contact",
+    updatable: true,
     schema: [
         {
             field: "type",

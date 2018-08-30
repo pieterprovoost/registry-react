@@ -1,5 +1,6 @@
 module.exports = {
     name: "machineTag",
+    updatable: false,
     schema: [
       {
         field: "name",

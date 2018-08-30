@@ -14,11 +14,12 @@ import Moment from 'react-moment';
 import axios from "axios";
 import queryString from 'query-string';
 import { NavLink } from "react-router-dom";
+import RegistryFormWrapper from './RegistryFormWrapper';
 
 const _ = require('lodash')
 
 const baseEndpoint = require('../../config/config').dataApi;
-
+const subrouteMappings = require('../../config/config').subrouteMappings;
 
 const styles = theme => ({
   root: {
@@ -38,14 +39,15 @@ class EntityListPage extends React.Component {
   constructor(props) {
     super(props);
     this.getData = this.getData.bind(this);
-
+    const { path } = this.props;
     this.state = {
       data: [],
       page: 0,
       offset: 0,
       rowsPerPage: 25,
       rowsPerPageOptions: [25, 50, 100],
-      count: 0
+      count: 0,
+      hasOrganization: (path === 'installation' || path === 'dataset')
     };
   }
 
@@ -72,7 +74,20 @@ class EntityListPage extends React.Component {
       }, this.getData);
     }
   }
-
+  attachOrganizations(result) {
+    const { path } = this.props;
+    let promises = [];
+    _.each(result.data.results, function (r) {
+      let key = (path === 'installation') ? 'organizationKey' : 'publishingOrganizationKey'
+      promises.push(axios(`${baseEndpoint}organization/` + r[key])
+        .then(function (res) {
+          r.organization = res.data
+        }))
+    })
+    return Promise.all(promises).then(function () {
+      return result;
+    })
+  }
   getData() {
     const that = this;
     const { endpoint, path } = this.props;
@@ -83,19 +98,13 @@ class EntityListPage extends React.Component {
       url += '&' + queryString.stringify(filter);
     }
     axios(url).then((result) => {
-      let promises = [];
-      _.each(result.data.results, function (r) {
-        let key = (path === 'installation') ? 'organizationKey' : 'publishingOrganizationKey'
-        promises.push(axios(`${baseEndpoint}organization/` + r[key])
-          .then(function (res) {
-            r.organization = res.data
-          }))
-      })
-      return Promise.all(promises).then(function () {
-        return result;
-      }).catch(function(){
-        return result
-      })
+      if (this.state.hasOrganization) {
+        return that.attachOrganizations(result).catch(function () {
+          return result
+        })
+      } else { 
+        return result 
+      }
     })
       .then(function (res) {
         that.setState({
@@ -112,11 +121,12 @@ class EntityListPage extends React.Component {
 
   render() {
     const { classes, path } = this.props;
-    const { data, rowsPerPage, page, count, rowsPerPageOptions } = this.state;
-    const hasOrganization = (path === 'installation' || path === 'dataset')
-    const columns = (hasOrganization) ?  [path, 'organization', 'created', 'modified'] : [path,  'created', 'modified'];
+    const entity = subrouteMappings[path] || path;
+    const { data, rowsPerPage, page, count, rowsPerPageOptions, hasOrganization } = this.state;
+    const columns = (hasOrganization) ? [entity, 'organization', 'created', 'modified'] : [entity, 'created', 'modified'];
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, count - page * rowsPerPage);
     return (
+      <RegistryFormWrapper>
       <Paper className={classes.root}>
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -132,10 +142,10 @@ class EntityListPage extends React.Component {
                 return (
                   <TableRow key={n.key}>
                     <TableCell component="th" scope="row">
-                      <NavLink to={{ pathname: `/${path}/${n.key}`}} exact={true} activeClassName="active">{n.title}</NavLink>
+                      <NavLink to={{ pathname: `/${entity}/${n.key}` }} exact={true} activeClassName="active">{n.title}</NavLink>
 
                     </TableCell>
-                    {hasOrganization && <TableCell><NavLink to={{ pathname: `/organization/${n.organization.key}`}} exact={true} activeClassName="active">{n.organization.title}</NavLink></TableCell>}
+                    {hasOrganization && <TableCell><NavLink to={{ pathname: `/organization/${n.organization.key}` }} exact={true} activeClassName="active">{n.organization.title}</NavLink></TableCell>}
                     <TableCell><Moment format="LL">{n.created}</Moment></TableCell>
                     <TableCell ><Moment format="LL">{n.modified}</Moment></TableCell>
                   </TableRow>
@@ -164,6 +174,7 @@ class EntityListPage extends React.Component {
           </Table>
         </div>
       </Paper>
+      </RegistryFormWrapper>
     );
   }
 }

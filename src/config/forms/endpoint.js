@@ -1,5 +1,6 @@
 module.exports = {
     name: "endpoint",
+    updatable: false,
     schema: [
       {
         field: "type",

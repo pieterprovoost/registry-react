@@ -19,14 +19,15 @@ class Title extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.id !== this.props.id) {
+    if ((prevProps.type !== this.props.type) || (prevProps.id !== this.props.id)) {
       console.log('updated');
       this.getTitle();
     }
   }
-
+ 
   getTitle() {
-    axios(`//api.gbif.org/v1/${this.props.type}/${this.props.id}`)
+    if(this.props.id){
+      axios(`//api.gbif.org/v1/${this.props.type}/${this.props.id}`)
       .then(
         (res) => {
             this.setState({title: res.data.title, error: false});
@@ -38,6 +39,10 @@ class Title extends Component {
             this.setState({title: 'unknown', error: true});
         }
       )
+    } else {
+      this.setState({title: this.props.type});
+    }
+    
   }
   render() {
     let title = this.state.error ? <span className="discreet">unknown</span> : this.state.title;

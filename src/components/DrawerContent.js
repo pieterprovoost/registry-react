@@ -9,6 +9,10 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/Inbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
+import RouterIcon from '@material-ui/icons/Router';
+import BusinessIcon from '@material-ui/icons/Business';
+import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
+
 
 const styles = theme => ({
   active: {
@@ -26,19 +30,19 @@ class DrawerContent extends Component {
         <List component="nav">
           <ListItem button component={NavLink} to={{ pathname: '/organization' }} activeClassName={classes.active}>
             <ListItemIcon>
-              <InboxIcon />
+              <BusinessIcon />
             </ListItemIcon>
             <ListItemText primary="Publisher" />
           </ListItem>
           <ListItem button component={NavLink} to={{ pathname: '/dataset' }} activeClassName={classes.active}>
             <ListItemIcon>
-              <DraftsIcon />
+              <FormatListNumberedIcon />
             </ListItemIcon>
             <ListItemText primary="Dataset" />
           </ListItem>
           <ListItem button component={NavLink} to={{ pathname: '/installation' }} activeClassName={classes.active}>
             <ListItemIcon>
-              <DraftsIcon />
+              <RouterIcon />
             </ListItemIcon>
             <ListItemText primary="Installation" />
           </ListItem>

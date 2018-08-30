@@ -1,5 +1,6 @@
 module.exports = {
     name: "identifier",
+    updatable: false,
     schema: [
       {
         field: "identifier",
