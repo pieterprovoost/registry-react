@@ -15,7 +15,8 @@ import axios from "axios";
 import queryString from 'query-string';
 import { NavLink } from "react-router-dom";
 import RegistryFormWrapper from './RegistryFormWrapper';
-
+import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
 const _ = require('lodash')
 
 const baseEndpoint = require('../../config/config').dataApi;
@@ -23,12 +24,13 @@ const subrouteMappings = require('../../config/config').subrouteMappings;
 
 const styles = theme => ({
   root: {
-    flexGrow: 1,
-    margin: 20,
-    padding: 20,
+    flexGrow: 1
   },
   table: {
     minWidth: 500,
+  },
+  buttonGrid : {
+    marginBottom: '20px'
   },
   tableWrapper: {
     overflowX: 'auto',
@@ -127,6 +129,14 @@ class EntityListPage extends React.Component {
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, count - page * rowsPerPage);
     return (
       <RegistryFormWrapper>
+        <Grid item 
+            container
+            direction="row"
+            justify="flex-end"
+            alignItems="center"
+            className={classes.buttonGrid}>
+            <Button variant="contained" href={`/${entity}/new`} color="primary" className={classes.button} >Add new</Button>
+          </Grid>
       <Paper className={classes.root}>
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -180,7 +190,7 @@ class EntityListPage extends React.Component {
 }
 
 EntityListPage.propTypes = {
-  path: PropTypes.oneOf(['dataset', 'organization', 'installation', 'node', 'hostedDataset', 'publishedDataset', 'constituents']).isRequired,
+  path: PropTypes.oneOf(['dataset', 'organization', 'installation', 'node', 'hostedDataset', 'publishedDataset', 'constituents', 'pendingEndorsement']).isRequired,
   classes: PropTypes.object.isRequired,
 };
 

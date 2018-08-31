@@ -7,7 +7,8 @@ import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import RegistryForm from '../shared/RegistryForm'
 import NestedPropertyList from '../shared/NestedPropertyList'
-const baseEndpoint = 'https://api.gbif.org/v1/';
+const baseEndpoint = require('../../config/config').dataApi;
+
 
 
 const styles = theme => ({
@@ -40,18 +41,27 @@ class NestedPropertyPage extends React.Component {
   }
   getData() {
     var that = this;
-    const { path } = this.props;
-    axios(`${baseEndpoint}${path}`)
+    const { path, readOnly } = this.props;
+    if(readOnly){
+      let splitted = path.split('/');
+      axios(`${baseEndpoint}${splitted[0]}/${splitted[1]}`)
+      .then((result) => {
+        that.setState({ resolved: true, data: result.data[splitted[2]+'s'] })
+      })
+    } else {
+      axios(`${baseEndpoint}${path}`)
       .then((result) => {
         that.setState({ resolved: true, data: result.data })
       })
+    }
+   
 
   }
   toggleForm() {
     this.setState({ showForm: !this.state.showForm })
   }
   render() {
-    const { classes, path, config } = this.props;
+    const { classes, path, config, readOnly } = this.props;
     const { data, showForm } = this.state;
     return (
       <div className={classes.root}>
@@ -62,17 +72,17 @@ class NestedPropertyPage extends React.Component {
             direction="row"
             justify="flex-end"
             alignItems="center">
-            {!showForm && <Button variant="contained" color="primary" className={classes.button} onClick={this.toggleForm}>Add new</Button>}
+            {!showForm && !readOnly && <Button variant="contained" color="primary" className={classes.button} onClick={this.toggleForm}>Add new</Button>}
           </Grid>
           <Grid item xs={false} md={2} />
           <Grid item xs={false} md={2} />
           <Grid item xs={12} md={8}>
-            {showForm && <RegistryForm config={config} path={path} onCancel={this.toggleForm}></RegistryForm>}
+            {showForm && <RegistryForm config={config} path={path} onCancel={this.toggleForm} onSave={this.getData}></RegistryForm>}
           </Grid><Grid item xs={false} md={2} />
           <Grid item xs={false} md={2} />
           <Grid item xs={12} md={8}>
             <Paper className={classes.paper}>
-              <NestedPropertyList data={data} config={config}></NestedPropertyList>
+              <NestedPropertyList data={data} path={path} config={config} onChange={this.getData} readOnly={readOnly}></NestedPropertyList>
             </Paper>
 
           </Grid>

@@ -1,5 +1,6 @@
 module.exports = {
-    "name": "organization",
+    "name": "node",
+    "readOnly": true,
     "schema": [
       {
         field: "title",
@@ -25,27 +26,34 @@ module.exports = {
         field: "type",
         type: "enum",
         name: "NodeType",
-        editable: true
+        editable: false
       },
       {
         field: "participationStatus",
         type: "enum",
         name: "ParticipationStatus",
-        editable: true
-      },
-      {
-        field: "country",
-        type: "enum",
-        name: "Country",
-        editable: true
+        editable: false
       },
       {
         field: "gbifRegion",
         type: "enum",
         name: "GbifRegion",
-        editable: true
-      }
+        editable: false
+      },
+      {
+        field: "country",
+        type: "enum",
+        name: "Country",
+        editable: false
+      },
+      {
+        field: "continent",
+        type: "enum",
+        name: "Continent",
+        editable: false
+      },
     ],
-    nested: ['contact', 'endpoint', 'identifier', 'tag', 'machineTag', 'comment'],
-    relations: ['dataset', 'organization','installation']
+    nestedReadOnly: ['contact'],
+    nested: [ 'endpoint', 'identifier', 'tag', 'machineTag', 'comment'],
+    relations: ['dataset', 'organization','installation', 'pendingEndorsement']
   }

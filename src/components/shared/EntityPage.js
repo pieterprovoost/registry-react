@@ -35,7 +35,6 @@ const styles = theme => ({
 
 
 
-
 class EntityPage extends Component {
 
     constructor(props) {
@@ -57,7 +56,7 @@ class EntityPage extends Component {
     const { classes } = this.props;
     const { value, config } = this.state;
     const { match: { params: { key } } } = this.props;
-    const tabs = config.nested.concat(config.relations) ;
+    const tabs = config.nestedReadOnly.concat(config.nested.concat(config.relations)) ;
 
     const tabElements = tabs.map(name => {
       return <Tab key={name} value={name} label={name} to={`/${config.name}/${this.props.match.params.key}/${name}`} component={NavLink} />
@@ -74,12 +73,15 @@ class EntityPage extends Component {
             scrollButtons="auto"
           >
             <Tab value="root" label="Publisher" to={`/${config.name}/${this.props.match.params.key}`} component={NavLink} />
-            {tabElements}
+            {key !== 'new' && tabElements}
           </Tabs>
         </AppBar>
         {value === 'root' && <TabContainer><RegistryFormWrapper><RegistryForm config={config} path={`${config.name}`} id={this.props.match.params.key}></RegistryForm></RegistryFormWrapper></TabContainer>}
+        {config.nestedReadOnly.map(function (type) {
+          return (value === type) ? <TabContainer key={type}><NestedPropertyPage  config={require(`../../config/forms/${type}`)} path={`${config.name}/${key}/${type}`} readOnly={true}></NestedPropertyPage></TabContainer> : "";
+        })}
         {config.nested.map(function (type) {
-          return (value === type) ? <TabContainer key={type}><NestedPropertyPage  config={require(`../../config/forms/${type}`)} path={`${config.name}/${key}/${type}`}></NestedPropertyPage></TabContainer> : "";
+          return (value === type) ? <TabContainer key={type}><NestedPropertyPage  config={require(`../../config/forms/${type}`)} path={`${config.name}/${key}/${type}`} ></NestedPropertyPage></TabContainer> : "";
         })}
         {config.relations.map(function (type) {
           return (value === type) ? <TabContainer key={type}><EntitylistPage endpoint={`${config.name}/${key}/${type}`} path={type}></EntitylistPage></TabContainer> : "";

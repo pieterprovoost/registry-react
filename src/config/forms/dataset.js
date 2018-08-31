@@ -13,7 +13,7 @@ module.exports = {
         editable: true
       },
       {
-        field: "subType",
+        field: "subtype",
         type: "enum",
         name: "DatasetSubtype",
         editable: true
@@ -81,9 +81,9 @@ module.exports = {
     },
     {
         field: "citation",
-        type: "text",
+        type: "nestedText",
         multiline: true,
-        editable: true
+        editable: false
       },
       {
         field: "citationIdentifier",
@@ -119,6 +119,7 @@ module.exports = {
       },
       
     ],
+    nestedReadOnly: [],
     nested: ['contact', 'endpoint', 'identifier', 'tag', 'machineTag', 'comment'],
     relations: ['constituents']
   }

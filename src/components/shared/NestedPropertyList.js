@@ -58,12 +58,16 @@ class NestedPropertyList extends React.Component {
     this.setState({item: null})
 
   }
+  onSave = () =>{
+    this.setState({item: null})
+    this.props.onChange()
+  }
 
   render() {
-    const { data, config, classes } = this.props;
+    const { data, config, classes, path, readOnly } = this.props;
     const { item } = this.state;
     if(item !== null){
-      return <RegistryForm id={item.key} data={item} config={config} onCancel={this.onCancelForm}></RegistryForm>
+      return <RegistryForm id={item.key} data={item} path={path} config={config} onCancel={this.onCancelForm} onSave={this.onSave}></RegistryForm>
     } 
     else if(data.length > 0){
       return (
@@ -71,14 +75,14 @@ class NestedPropertyList extends React.Component {
           {data.map(elm => {
             return <ListItem key={elm.key}>
               <ListItemText primary={this.getItemText(elm)} secondary={`Created ${moment(elm.createdAt).format('LL')} by ${elm.createdBy}`} />
-              <ListItemSecondaryAction>
+             {!readOnly && <ListItemSecondaryAction>
                 {config.updatable && <IconButton aria-label="Edit" value={elm} onClick={(e) => this.editItem(elm)}>
                   <EditIcon />
                 </IconButton>}
                 <IconButton aria-label="Delete">
                   <DeleteIcon />
                 </IconButton>
-              </ListItemSecondaryAction>
+              </ListItemSecondaryAction>}
             </ListItem>
           })}
         </List>

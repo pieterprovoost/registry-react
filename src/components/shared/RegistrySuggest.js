@@ -6,6 +6,7 @@ import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import axios from 'axios'
+const baseEndpoint = require('../../config/config').dataApi;
 
 function debounce(fn, time) {
   let timeoutId
@@ -21,7 +22,6 @@ function debounce(fn, time) {
   }
 }
 
-const baseEndpoint = 'http://api.gbif.org/v1/'
 
 
 function renderInput(inputProps) {

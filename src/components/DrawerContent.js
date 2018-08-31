@@ -7,8 +7,6 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/Inbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
 import RouterIcon from '@material-ui/icons/Router';
 import BusinessIcon from '@material-ui/icons/Business';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
@@ -46,14 +44,17 @@ class DrawerContent extends Component {
             </ListItemIcon>
             <ListItemText primary="Installation" />
           </ListItem>
+          <ListItem button component={NavLink} to={{ pathname: '/node' }} activeClassName={classes.active}>
+            <ListItemIcon>
+              <RouterIcon />
+            </ListItemIcon>
+            <ListItemText primary="Node" />
+          </ListItem>
         </List>
         <Divider />
         <List component="nav">
           <ListItem button>
             <ListItemText primary="Login" />
-          </ListItem>
-          <ListItem button component="a" href="#simple-list">
-            <ListItemText primary="Something" />
           </ListItem>
         </List>
       </div>

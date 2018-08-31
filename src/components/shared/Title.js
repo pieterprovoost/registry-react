@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+const baseEndpoint = require('../../config/config').dataApi;
 
 class Title extends Component {
   constructor(props) {
@@ -26,8 +27,8 @@ class Title extends Component {
   }
  
   getTitle() {
-    if(this.props.id){
-      axios(`//api.gbif.org/v1/${this.props.type}/${this.props.id}`)
+    if(this.props.id && this.props.id !=='new'){
+      axios(`${baseEndpoint}${this.props.type}/${this.props.id}`)
       .then(
         (res) => {
             this.setState({title: res.data.title, error: false});
@@ -39,6 +40,8 @@ class Title extends Component {
             this.setState({title: 'unknown', error: true});
         }
       )
+    } else if(this.props.id ==='new'){
+      this.setState({title: `New ${this.props.type}`});
     } else {
       this.setState({title: this.props.type});
     }

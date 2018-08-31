@@ -45,6 +45,7 @@ module.exports = {
       editable: true
     }
   ],
+  nestedReadOnly: [],
   nested: ['contact', 'endpoint', 'identifier', 'tag', 'machineTag', 'comment'],
   relations: ['hostedDataset', 'publishedDataset','installation']
 }

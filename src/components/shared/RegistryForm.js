@@ -13,6 +13,7 @@ import ChipInput from 'material-ui-chip-input'
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Button from '@material-ui/core/Button';
+import history from '../../history'
 
 const baseEndpoint = require('../../config/config').dataApi;
 
@@ -52,19 +53,19 @@ class RegistryForm extends React.Component {
         this.getData = this.getData.bind(this);
         this.getFormField = this.getFormField.bind(this);
         this.exitEditMode = this.exitEditMode.bind(this);
-        const isNestedProperty = (this.props.id  && this.props.data);
-        let editMode = !this.props.id || isNestedProperty
+        const isNestedProperty = (this.props.id && this.props.data);
+        let editMode = !this.props.id || this.props.id === 'new' || isNestedProperty 
         this.state = {
-            resolved: !this.props.id || isNestedProperty,
+            resolved: !this.props.id || this.props.id === 'new' || isNestedProperty,
             editMode: editMode,
-            data: this.props.data || {},
+            data: this.props.data || { citation: {}},
             isNestedProperty: isNestedProperty
         };
 
     }
 
     componentWillMount() {
-        if (!this.props.data && this.props.id) {
+        if (!this.props.data && this.props.id && this.props.id !=='new') {
             this.getData()
         }
     }
@@ -88,16 +89,20 @@ class RegistryForm extends React.Component {
             this.getData();
         }
         // editMode switch doesn´t toogle if only editMode is flipped, the version will make it update. 
-        this.setState({editMode: false, version: Math.random()})
+        this.setState({ editMode: false, version: Math.random() })
 
         if (this.props.onCancel) {
             this.props.onCancel()
         }
     }
 
-    handleChange = name => event => {
+    handleChange = config => event => {
         var data = { ...this.state.data }
-        data[name] = event.target.value
+        if (config && config.type === 'nestedText') {
+            data[config.field] = { text: event.target.value }
+        } else {
+            data[config.field] = event.target.value
+        }
         this.setState({
             data: data,
         });
@@ -123,7 +128,11 @@ class RegistryForm extends React.Component {
     }
     handleAddChip = (val, field) => {
         var data = { ...this.state.data }
-        data[field].push(val);
+        if (data[field]) {
+            data[field] = [val]
+        } else {
+            data[field].push(val);
+        }
         this.setState({
             data: data,
         });
@@ -137,6 +146,36 @@ class RegistryForm extends React.Component {
         });
         console.log(data)
     }
+    saveData = () => {
+        var that = this;
+        const { path, id, onSave } = this.props;
+        const { data, isNestedProperty } = this.state;
+        let endpoint = (id && id!== 'new') ? `${baseEndpoint}${path}/${id}` : `${baseEndpoint}${path}`;
+        let method = (id && id!== 'new') ? 'put' : 'post';
+        let gbifusr = localStorage.getItem('gbifusr');
+        let gbifpw = localStorage.getItem('gbifpw');
+        const axConfig = {
+            auth: {
+                username: gbifusr,
+                password: gbifpw
+            }
+        }
+        axios[method](endpoint, data, axConfig)
+            .then(function (res) {
+               if(!isNestedProperty && id=== 'new'){
+                history.push(`/${path}/${res.data}`);
+               } else if(!isNestedProperty && id !== 'new'){
+                that.setState({editMode: false})
+               } else if(isNestedProperty && onSave) {
+                onSave(data)
+               } 
+                
+            })
+            .catch(function (err) {
+                alert("ERROR: " + err.message)
+            })
+
+    }
     getFormField(config) {
         const { classes } = this.props;
         const { data, editMode } = this.state;
@@ -148,10 +187,25 @@ class RegistryForm extends React.Component {
                     label={config.field}
                     className={classes.textField}
                     value={this.state.data[config.field]}
-                    onChange={this.handleChange(config.field)}
+                    onChange={this.handleChange(config)}
                     multiline={config.multiline || false}
                     margin="normal"
-                    disabled={!editMode}
+                    disabled={!editMode || !config.editable}
+                    helperText={config.helperText}
+
+                />
+            }
+            case "nestedText": {
+                return <TextField
+                    key={config.field}
+                    id={config.field}
+                    label={config.field}
+                    className={classes.textField}
+                    value={this.state.data[config.field].text}
+                    onChange={this.handleChange(config)}
+                    multiline={config.multiline || false}
+                    margin="normal"
+                    disabled={!editMode || !config.editable}
                     helperText={config.helperText}
 
                 />
@@ -164,7 +218,7 @@ class RegistryForm extends React.Component {
                     value={this.state.data[config.field]}
                     onAdd={(chip) => this.handleAddChip(chip, config.field)}
                     onDelete={(chip, index) => this.handleDeleteChip(chip, index, config.field)}
-                    disabled={!editMode}
+                    disabled={!editMode || !config.editable}
                 />
             }
             case "relation": {
@@ -174,17 +228,19 @@ class RegistryForm extends React.Component {
                     selectedKey={data[config.field]}
                     type={config.name}
                     placeholder={config.field}
-                    disabled={!editMode} />
+                    disabled={!editMode || !config.editable}
+                />
             }
             case "enum": {
                 return <RegistryEnumSelect
                     key={config.field}
                     value={data[config.field]}
                     type={config.name}
-                    onChange={this.handleChange(config.field)}
+                    onChange={this.handleChange(config)}
                     label={config.field}
                     helperText={config.helperText}
-                    disabled={!editMode} />
+                    disabled={!editMode || !config.editable}
+                />
             }
             case "boolean": {
                 return <FormControl key={`${config.field}_control`}><FormControlLabel
@@ -193,7 +249,7 @@ class RegistryForm extends React.Component {
                         <Checkbox
                             checked={this.state.data[config.field]}
                             onChange={(e, checked) => this.setBoolean(checked, config.field)}
-                            disabled={!editMode}
+                            disabled={!editMode || !config.editable}
                         />
                     }
                     label={config.field}
@@ -220,7 +276,7 @@ class RegistryForm extends React.Component {
             return (
                 <form className={classes.root} noValidate autoComplete="off">
                     <Grid>
-                        {(id && !isNestedProperty) && <FormControlLabel
+                        {(id && id !=='new' && !isNestedProperty && !config.readOnly) && <FormControlLabel
                             control={
                                 <Switch
                                     key={this.state.version}
@@ -242,7 +298,7 @@ class RegistryForm extends React.Component {
                                 <Button variant="contained" className={classes.button} onClick={this.exitEditMode}>
                                     Cancel
                                         </Button>
-                                <Button variant="contained" color="primary" className={classes.button}>
+                                <Button variant="contained" color="primary" className={classes.button} onClick={this.saveData}>
                                     Submit
                                         </Button></Grid>}
 
