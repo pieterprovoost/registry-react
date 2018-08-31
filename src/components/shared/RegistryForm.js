@@ -128,7 +128,7 @@ class RegistryForm extends React.Component {
     }
     handleAddChip = (val, field) => {
         var data = { ...this.state.data }
-        if (data[field]) {
+        if (!data[field]) {
             data[field] = [val]
         } else {
             data[field].push(val);
