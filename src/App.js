@@ -23,6 +23,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Hidden from '@material-ui/core/Hidden';
 import AppBarTitle from './components/AppBarTitle';
+import Login from './components/Login';
+
 
 const theme = createMuiTheme({
   palette: {
@@ -142,7 +144,7 @@ class App extends Component {
                 {mainEntities.map(function(entity){
                   return <Route exact key={entity} path={`/${entity}`} render={(props) => <EntitylistPage path={entity} />} />
                 })}
-
+                <Route exact  path="/login" component={Login} />
                 <Route component={NoMatch} />
               </Switch>
             </main>

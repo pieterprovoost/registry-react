@@ -87,8 +87,8 @@ class RegistryForm extends React.Component {
         var that = this;
         const { path, id } = this.props;
         const ep = (path !== 'user') ? `${baseEndpoint}${path}/${id}` : `${adminEndpoint}${id}`;
-        let gbifusr = localStorage.getItem('gbifusr');
-        let gbifpw = localStorage.getItem('gbifpw');
+        let gbifusr = sessionStorage.getItem('gbifusr');
+        let gbifpw = sessionStorage.getItem('gbifpw');
         const axConfig = {
             auth: {
                 username: gbifusr,
@@ -103,6 +103,7 @@ class RegistryForm extends React.Component {
     setEditMode = enabled => {
         this.setState({
             editMode: enabled,
+            version: Math.random()
         });
     };
 
@@ -184,8 +185,8 @@ class RegistryForm extends React.Component {
         const postEndpoint = (path !== 'user') ? `${baseEndpoint}${path}` : adminEndpoint;
         let endpoint = (id && id !== 'new') ? putEndpoint : postEndpoint;
         let method = (id && id !== 'new') ? 'put' : 'post';
-        let gbifusr = localStorage.getItem('gbifusr');
-        let gbifpw = localStorage.getItem('gbifpw');
+        let gbifusr = sessionStorage.getItem('gbifusr');
+        let gbifpw = sessionStorage.getItem('gbifpw');
         const axConfig = {
             auth: {
                 username: gbifusr,

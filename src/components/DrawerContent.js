@@ -24,8 +24,26 @@ const styles = theme => ({
 
 class DrawerContent extends Component {
 
+  constructor(props){
+    super(props)
+    this.logout = this.logout.bind(this);
+
+    let pw = sessionStorage.getItem('gbifpw');
+    let usr = sessionStorage.getItem('gbifusr');
+    this.state = {
+      isLoggedIn: (pw && usr)
+    }
+  }
+
+  logout(){
+    sessionStorage.removeItem('gbifpw');
+    sessionStorage.removeItem('gbifusr');
+    this.setState({isLoggedIn: false})
+  }
+
   render() {
     const { classes } = this.props;
+    const { isLoggedIn } = this.state;
     return (
       <div>
         <Divider />
@@ -63,9 +81,12 @@ class DrawerContent extends Component {
         </List>
         <Divider />
         <List component="nav">
-          <ListItem button>
+         { !isLoggedIn && <ListItem button component={NavLink} to={{ pathname: '/login' }} activeClassName={classes.active}>
             <ListItemText primary="Login" />
-          </ListItem>
+          </ListItem>}
+          { isLoggedIn && <ListItem button  onClick={this.logout}>
+            <ListItemText primary="Logout" />
+          </ListItem>}
         </List>
       </div>
     );

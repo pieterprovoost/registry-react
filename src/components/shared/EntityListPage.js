@@ -103,8 +103,8 @@ class EntityListPage extends React.Component {
     if (filter && !endpoint) {
       url += '&' + queryString.stringify(filter);
     }
-    let gbifusr = localStorage.getItem('gbifusr');
-    let gbifpw = localStorage.getItem('gbifpw');
+    let gbifusr = sessionStorage.getItem('gbifusr');
+    let gbifpw = sessionStorage.getItem('gbifpw');
     const axConfig = {
         auth: {
             username: gbifusr,
