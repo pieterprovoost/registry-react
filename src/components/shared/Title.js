@@ -27,11 +27,13 @@ class Title extends Component {
   }
  
   getTitle() {
-    if(this.props.id && this.props.id !=='new'){
+    const {type} = this.props;
+    if(this.props.id && this.props.id !=='new' && this.props.type !== 'user'){
       axios(`${baseEndpoint}${this.props.type}/${this.props.id}`)
       .then(
         (res) => {
-            this.setState({title: res.data.title, error: false});
+              this.setState({title: res.data.title, error: false});
+
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -40,9 +42,11 @@ class Title extends Component {
             this.setState({title: 'unknown', error: true});
         }
       )
-    } else if(this.props.id ==='new'){
+    } else if(this.props.type === 'user' && this.props.id !=='new'){
+      this.setState({title: this.props.id, error: false});
+    } else if(this.props.id ==='new' ){
       this.setState({title: `New ${this.props.type}`});
-    } else {
+    }  else {
       this.setState({title: this.props.type});
     }
     

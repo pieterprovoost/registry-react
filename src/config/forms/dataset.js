@@ -80,7 +80,7 @@ module.exports = {
         editable: true
     },
     {
-        field: "citation",
+        field: "citation.text",
         type: "nestedText",
         multiline: true,
         editable: false

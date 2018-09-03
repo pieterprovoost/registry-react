@@ -20,6 +20,7 @@ import Button from '@material-ui/core/Button'
 const _ = require('lodash')
 
 const baseEndpoint = require('../../config/config').dataApi;
+const adminEndpoint = require('../../config/config').userAdminApi;
 const subrouteMappings = require('../../config/config').subrouteMappings;
 
 const styles = theme => ({
@@ -94,12 +95,23 @@ class EntityListPage extends React.Component {
     const that = this;
     const { endpoint, path } = this.props;
     const { offset, rowsPerPage, filter, page } = this.state;
+    
     var url = (endpoint) ? `${baseEndpoint}${endpoint}` : `${baseEndpoint}${path}?limit=${rowsPerPage}&offset=${rowsPerPage * page}`;
-
+    if(path === 'user'){
+      url = `${adminEndpoint}search?limit=${rowsPerPage}&offset=${rowsPerPage * page}&q=`
+    }
     if (filter && !endpoint) {
       url += '&' + queryString.stringify(filter);
     }
-    axios(url).then((result) => {
+    let gbifusr = localStorage.getItem('gbifusr');
+    let gbifpw = localStorage.getItem('gbifpw');
+    const axConfig = {
+        auth: {
+            username: gbifusr,
+            password: gbifpw
+        }
+    }
+    axios(url, axConfig).then((result) => {
       if (this.state.hasOrganization) {
         return that.attachOrganizations(result).catch(function () {
           return result
@@ -119,7 +131,17 @@ class EntityListPage extends React.Component {
         });
       })
   }
-
+  getItemText(elm) {
+    const { path } = this.props;
+    switch (path) {
+      case 'user': {
+        return `${elm.lastName}, ${elm.firstName}`
+      }
+      default: {
+        return elm.title
+      }
+    }
+  }
 
   render() {
     const { classes, path } = this.props;
@@ -152,7 +174,8 @@ class EntityListPage extends React.Component {
                 return (
                   <TableRow key={n.key}>
                     <TableCell component="th" scope="row">
-                      <NavLink to={{ pathname: `/${entity}/${n.key}` }} exact={true} activeClassName="active">{n.title}</NavLink>
+                     { entity !== 'user' && <NavLink to={{ pathname: `/${entity}/${n.key}` }} exact={true} activeClassName="active">{this.getItemText(n)}</NavLink>}
+                     { entity === 'user' && <NavLink to={{ pathname: `/${entity}/${n.userName}` }} exact={true} activeClassName="active">{this.getItemText(n)}</NavLink>}
 
                     </TableCell>
                     {hasOrganization && <TableCell><NavLink to={{ pathname: `/organization/${n.organization.key}` }} exact={true} activeClassName="active">{n.organization.title}</NavLink></TableCell>}
@@ -190,7 +213,7 @@ class EntityListPage extends React.Component {
 }
 
 EntityListPage.propTypes = {
-  path: PropTypes.oneOf(['dataset', 'organization', 'installation', 'node', 'hostedDataset', 'publishedDataset', 'constituents', 'pendingEndorsement']).isRequired,
+  path: PropTypes.oneOf(['dataset', 'organization', 'installation', 'node', 'user', 'hostedDataset', 'publishedDataset', 'constituents', 'pendingEndorsement']).isRequired,
   classes: PropTypes.object.isRequired,
 };
 

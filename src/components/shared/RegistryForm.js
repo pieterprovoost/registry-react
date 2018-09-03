@@ -16,6 +16,7 @@ import Button from '@material-ui/core/Button';
 import history from '../../history'
 
 const baseEndpoint = require('../../config/config').dataApi;
+const adminEndpoint = require('../../config/config').userAdminApi;
 
 const styles = theme => ({
     root: {
@@ -30,7 +31,6 @@ const styles = theme => ({
         width: '100%',
     },
     menu: {
-
         width: '100%',
     },
     checkBoxHelperText: {
@@ -54,26 +54,48 @@ class RegistryForm extends React.Component {
         this.getFormField = this.getFormField.bind(this);
         this.exitEditMode = this.exitEditMode.bind(this);
         const isNestedProperty = (this.props.id && this.props.data);
-        let editMode = !this.props.id || this.props.id === 'new' || isNestedProperty 
+        let editMode = !this.props.id || this.props.id === 'new' || isNestedProperty
         this.state = {
             resolved: !this.props.id || this.props.id === 'new' || isNestedProperty,
             editMode: editMode,
-            data: this.props.data || { citation: {}},
+            data: this.props.data || this.getDefaultEntity(),
             isNestedProperty: isNestedProperty
         };
 
     }
 
     componentWillMount() {
-        if (!this.props.data && this.props.id && this.props.id !=='new') {
+        if (!this.props.data && this.props.id && this.props.id !== 'new') {
             this.getData()
         }
     }
-
+    getDefaultEntity(){
+        const { config } = this.props;
+        switch(config.name){
+            case 'user': {
+                return {roles: [], settings: {}}
+            }
+            case 'dataset': {
+                return { citation: {}}
+            }
+            default: {
+                return {};
+            }
+        }
+    }
     getData() {
         var that = this;
         const { path, id } = this.props;
-        axios(`${baseEndpoint}${path}/${id}`)
+        const ep = (path !== 'user') ? `${baseEndpoint}${path}/${id}` : `${adminEndpoint}${id}`;
+        let gbifusr = localStorage.getItem('gbifusr');
+        let gbifpw = localStorage.getItem('gbifpw');
+        const axConfig = {
+            auth: {
+                username: gbifusr,
+                password: gbifpw
+            }
+        }
+        axios(ep, axConfig)
             .then((result) => {
                 that.setState({ resolved: true, data: result.data })
             })
@@ -85,8 +107,10 @@ class RegistryForm extends React.Component {
     };
 
     exitEditMode = () => {
-        if (this.props.id && !this.state.isNestedProperty) {
+        if (this.props.id && this.props.id !== 'new' && !this.state.isNestedProperty) {
             this.getData();
+        } else if (this.props.id && this.props.id === 'new' && !this.state.isNestedProperty) {
+            history.push(`/${this.props.path}`);
         }
         // editMode switch doesn´t toogle if only editMode is flipped, the version will make it update. 
         this.setState({ editMode: false, version: Math.random() })
@@ -98,8 +122,14 @@ class RegistryForm extends React.Component {
 
     handleChange = config => event => {
         var data = { ...this.state.data }
-        if (config && config.type === 'nestedText') {
-            data[config.field] = { text: event.target.value }
+        if (config && (config.type === 'nestedText' || config.type === 'nestedEnum')) {
+            let splitted = config.field.split('.');
+            if(splitted.length !== 2){
+                throw new Error('This doesn´t seem like a nested field. Should have this form: parent.child')
+            }
+            let obj = {};
+            obj[splitted[1]] = event.target.value;
+            data[splitted[0]] = obj;
         } else {
             data[config.field] = event.target.value
         }
@@ -150,8 +180,10 @@ class RegistryForm extends React.Component {
         var that = this;
         const { path, id, onSave } = this.props;
         const { data, isNestedProperty } = this.state;
-        let endpoint = (id && id!== 'new') ? `${baseEndpoint}${path}/${id}` : `${baseEndpoint}${path}`;
-        let method = (id && id!== 'new') ? 'put' : 'post';
+        const putEndpoint = (path !== 'user') ? `${baseEndpoint}${path}/${id}` : `${adminEndpoint}${id}`;
+        const postEndpoint = (path !== 'user') ? `${baseEndpoint}${path}` : adminEndpoint;
+        let endpoint = (id && id !== 'new') ? putEndpoint : postEndpoint;
+        let method = (id && id !== 'new') ? 'put' : 'post';
         let gbifusr = localStorage.getItem('gbifusr');
         let gbifpw = localStorage.getItem('gbifpw');
         const axConfig = {
@@ -162,14 +194,14 @@ class RegistryForm extends React.Component {
         }
         axios[method](endpoint, data, axConfig)
             .then(function (res) {
-               if(!isNestedProperty && id=== 'new'){
-                history.push(`/${path}/${res.data}`);
-               } else if(!isNestedProperty && id !== 'new'){
-                that.setState({editMode: false})
-               } else if(isNestedProperty && onSave) {
-                onSave(data)
-               } 
-                
+                if (!isNestedProperty && id === 'new') {
+                    history.push(`/${path}/${res.data}`);
+                } else if (!isNestedProperty && id !== 'new') {
+                    that.setState({ editMode: false })
+                } else if (isNestedProperty && onSave) {
+                    onSave(data)
+                }
+
             })
             .catch(function (err) {
                 alert("ERROR: " + err.message)
@@ -196,12 +228,18 @@ class RegistryForm extends React.Component {
                 />
             }
             case "nestedText": {
+                let splitted = config.field.split('.');
+                if(splitted.length !== 2){
+                    throw new Error('This doesn´t seem like a nested field. Should have this form: parent.child')
+                }
+                let parentKey = splitted[0];
+                let childKey = splitted[1];
                 return <TextField
-                    key={config.field}
-                    id={config.field}
-                    label={config.field}
+                    key={parentKey}
+                    id={parentKey}
+                    label={parentKey}
                     className={classes.textField}
-                    value={this.state.data[config.field].text}
+                    value={this.state.data[parentKey][childKey]}
                     onChange={this.handleChange(config)}
                     multiline={config.multiline || false}
                     margin="normal"
@@ -234,7 +272,26 @@ class RegistryForm extends React.Component {
             case "enum": {
                 return <RegistryEnumSelect
                     key={config.field}
+                    multiple={config.multiple}
                     value={data[config.field]}
+                    type={config.name}
+                    onChange={this.handleChange(config)}
+                    label={config.field}
+                    helperText={config.helperText}
+                    disabled={!editMode || !config.editable}
+                />
+            }
+            case "nestedEnum": {
+                let splitted = config.field.split('.');
+                if(splitted.length !== 2){
+                    throw new Error('This doesn´t seem like a nested field. Should have this form: parent.child')
+                }
+                let parentKey = splitted[0];
+                let childKey = splitted[1];
+                return <RegistryEnumSelect
+                    key={parentKey}
+                    multiple={config.multiple}
+                    value={data[parentKey][childKey]}
                     type={config.name}
                     onChange={this.handleChange(config)}
                     label={config.field}
@@ -276,7 +333,7 @@ class RegistryForm extends React.Component {
             return (
                 <form className={classes.root} noValidate autoComplete="off">
                     <Grid>
-                        {(id && id !=='new' && !isNestedProperty && !config.readOnly) && <FormControlLabel
+                        {(id && id !== 'new' && !isNestedProperty && !config.readOnly) && <FormControlLabel
                             control={
                                 <Switch
                                     key={this.state.version}

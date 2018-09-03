@@ -72,7 +72,7 @@ class EntityPage extends Component {
             scrollable
             scrollButtons="auto"
           >
-            <Tab value="root" label="Publisher" to={`/${config.name}/${this.props.match.params.key}`} component={NavLink} />
+            <Tab value="root" label={config.name} to={`/${config.name}/${this.props.match.params.key}`} component={NavLink} />
             {key !== 'new' && tabElements}
           </Tabs>
         </AppBar>

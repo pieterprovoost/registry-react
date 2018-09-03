@@ -84,7 +84,7 @@ class App extends Component {
 
   render() {
     const { classes } = this.props;
-    const mainEntities = ['dataset', 'organization', 'installation', 'node']
+    const mainEntities = ['dataset', 'organization', 'installation', 'node', 'user']
     return (
       <Router history={history}>
         <MuiThemeProvider theme={theme}>

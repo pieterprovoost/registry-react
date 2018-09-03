@@ -10,6 +10,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 import RouterIcon from '@material-ui/icons/Router';
 import BusinessIcon from '@material-ui/icons/Business';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
+import PeopleIcon from '@material-ui/icons/People';
+import GroupWorkIcon from '@material-ui/icons/GroupWork';
+
+
 
 
 const styles = theme => ({
@@ -46,9 +50,15 @@ class DrawerContent extends Component {
           </ListItem>
           <ListItem button component={NavLink} to={{ pathname: '/node' }} activeClassName={classes.active}>
             <ListItemIcon>
-              <RouterIcon />
+              <GroupWorkIcon />
             </ListItemIcon>
             <ListItemText primary="Node" />
+          </ListItem>
+          <ListItem button component={NavLink} to={{ pathname: '/user' }} activeClassName={classes.active}>
+            <ListItemIcon>
+              <PeopleIcon />
+            </ListItemIcon>
+            <ListItemText primary="User" />
           </ListItem>
         </List>
         <Divider />
