@@ -3,6 +3,11 @@ module.exports = {
     updatable: true,
     schema: [
         {
+            field: "userName",
+            type: "text",
+            editable: false
+        },
+        {
             field: "firstName",
             type: "text",
             editable: true
