@@ -87,7 +87,8 @@ class NestedPropertyPage extends React.Component {
       const { data } = that.state;
       for (var i = 0; i < data.length; i++) {
         if (data[i].key === id) {
-          that.setState({ snackbar: { variant: 'success', message: that.getItemText(data[i]), open: true } })
+          let msg = `${that.getItemText(data[i])} successfully saved`
+          that.setState({ snackbar: { variant: 'success', message: msg, open: true } })
           break;
         }
       }

@@ -185,7 +185,6 @@ class RegistryForm extends React.Component {
         let method = (id && id !== 'new') ? 'put' : 'post';
         let gbifusr = sessionStorage.getItem('gbifusr');
         let gbifpw = sessionStorage.getItem('gbifpw');
-        console.log(endpoint)
         const axConfig = {
             auth: {
                 username: gbifusr,
@@ -219,7 +218,7 @@ class RegistryForm extends React.Component {
                     id={config.field}
                     label={config.field}
                     className={classes.textField}
-                    value={this.state.data[config.field]}
+                    value={this.state.data[config.field] || ''}
                     onChange={this.handleChange(config)}
                     multiline={config.multiline || false}
                     margin="normal"
@@ -240,7 +239,7 @@ class RegistryForm extends React.Component {
                     id={parentKey}
                     label={parentKey}
                     className={classes.textField}
-                    value={this.state.data[parentKey][childKey]}
+                    value={this.state.data[parentKey][childKey] || ''}
                     onChange={this.handleChange(config)}
                     multiline={config.multiline || false}
                     margin="normal"
