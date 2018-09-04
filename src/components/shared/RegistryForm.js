@@ -179,7 +179,7 @@ class RegistryForm extends React.Component {
         var that = this;
         const { path, id, onSave, config } = this.props;
         const { data, isNestedProperty } = this.state;
-        const putEndpoint = (isNestedProperty) ? `${baseEndpoint}${path}/${id}` : `${config.endpoint}/${id}` ;
+        const putEndpoint = (isNestedProperty) ? `${baseEndpoint}${path}${id}` : `${config.endpoint}${id}` ;
         const postEndpoint = (isNestedProperty) ? `${baseEndpoint}${path}` : config.endpoint;
         let endpoint = (id && id !== 'new') ? putEndpoint : postEndpoint;
         let method = (id && id !== 'new') ? 'put' : 'post';
