@@ -52,7 +52,7 @@ class RegistryForm extends React.Component {
         this.getData = this.getData.bind(this);
         this.getFormField = this.getFormField.bind(this);
         this.exitEditMode = this.exitEditMode.bind(this);
-        const isNestedProperty = (this.props.id && this.props.data) || this.props.config.isNestedProperty;
+        let isNestedProperty = (this.props.id && this.props.data) || this.props.config.isNestedProperty;
         let editMode = !this.props.id || this.props.id === 'new' || isNestedProperty
         this.state = {
             resolved: !this.props.id || this.props.id === 'new' || isNestedProperty,
@@ -198,8 +198,9 @@ class RegistryForm extends React.Component {
                     history.push(`/${path}/${res.data}`);
                 } else if (!isNestedProperty && id !== 'new') {
                     that.setState({ editMode: false })
+                    onSave(res.data)
                 } else if (isNestedProperty && onSave) {
-                    onSave(data)
+                    onSave(res.data)
                 }
 
             })

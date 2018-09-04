@@ -12,7 +12,8 @@ import RegistryForm from '../shared/RegistryForm'
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
-
+import axios from 'axios';
+const baseEndpoint = require('../../config/config').dataApi;
 
 const styles = theme => ({
   root: {
@@ -29,6 +30,8 @@ class NestedPropertyList extends React.Component {
   constructor(props) {
     super(props)
     this.editItem = this.editItem.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
     this.state = {item: null}
   }
 
@@ -53,14 +56,34 @@ class NestedPropertyList extends React.Component {
   editItem  = item =>{
         this.setState({item: item})
   }
-
+  deleteItem = item => {
+    var that = this;
+    const {path} = this.props;
+    let gbifusr = sessionStorage.getItem('gbifusr');
+    let gbifpw = sessionStorage.getItem('gbifpw');
+    const axConfig = {
+        auth: {
+            username: gbifusr,
+            password: gbifpw
+        }
+    }
+    axios.delete(`${baseEndpoint}${path}/${item.key}`, axConfig)
+        .then(function (res) {
+          that.props.onDeleteItem(item)
+        })
+  }
   onCancelForm = () =>{
     this.setState({item: null})
 
   }
-  onSave = () =>{
+  onSave = (id) =>{
+    let itemId = this.state.item.key
     this.setState({item: null})
-    this.props.onChange()
+    if(id) {
+      this.props.onChange(id)
+    } else {
+      this.props.onChange(itemId)
+    }
   }
 
   render() {
@@ -79,7 +102,7 @@ class NestedPropertyList extends React.Component {
                 {config.updatable && <IconButton aria-label="Edit" value={elm} onClick={(e) => this.editItem(elm)}>
                   <EditIcon />
                 </IconButton>}
-                <IconButton aria-label="Delete">
+                <IconButton aria-label="Delete" value={elm} onClick={(e) => this.deleteItem(elm)}>
                   <DeleteIcon />
                 </IconButton>
               </ListItemSecondaryAction>}
