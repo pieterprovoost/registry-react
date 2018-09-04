@@ -2,7 +2,7 @@ const config = require('../config');
 
 module.exports = {
   "name": "organization",
-  "endpoint": `${config.dataApi}organization`,
+  "endpoint": `${config.dataApi}organization/`,
   "schema": [
     {
       field: "title",

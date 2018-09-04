@@ -2,7 +2,7 @@ const config = require('../config');
 
 module.exports = {
     "name": "dataset",
-    "endpoint": `${config.dataApi}dataset`,
+    "endpoint": `${config.dataApi}dataset/`,
     "schema": [
       {
         field: "title",

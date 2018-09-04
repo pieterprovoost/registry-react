@@ -93,7 +93,7 @@ class RegistryForm extends React.Component {
                 password: gbifpw
             }
         }
-        axios(`${config.endpoint}/${id}`, axConfig)
+        axios(`${config.endpoint}${id}`, axConfig)
             .then((result) => {
                 that.setState({ resolved: true, data: result.data })
             })
