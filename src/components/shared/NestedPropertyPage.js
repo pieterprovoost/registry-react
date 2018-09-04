@@ -46,12 +46,12 @@ class NestedPropertyPage extends React.Component {
       let splitted = path.split('/');
       axios(`${baseEndpoint}${splitted[0]}/${splitted[1]}`)
       .then((result) => {
-        that.setState({ resolved: true, data: result.data[splitted[2]+'s'] })
+        that.setState({ showForm: false, resolved: true, data: result.data[splitted[2]+'s'] })
       })
     } else {
       axios(`${baseEndpoint}${path}`)
       .then((result) => {
-        that.setState({ resolved: true, data: result.data })
+        that.setState({showForm: false, resolved: true, data: result.data })
       })
     }
    

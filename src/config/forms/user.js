@@ -1,11 +1,14 @@
+const config = require('../config');
+
 module.exports = {
     name: "user",
     updatable: true,
+    endpoint: `${config.userAdminApi}`,
     schema: [
         {
             field: "userName",
             type: "text",
-            editable: false
+            editable: true
         },
         {
             field: "firstName",
@@ -17,7 +20,7 @@ module.exports = {
             type: "text",
             editable: true
         },
-        
+
         {
             field: "email",
             type: "text",
@@ -35,9 +38,9 @@ module.exports = {
             name: "UserRole",
             multiple: true,
             editable: true
-          },
+        },
     ],
     nestedReadOnly: [],
-  nested: [],
-  relations: []
+    nested: [],
+    relations: []
 }

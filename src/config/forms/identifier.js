@@ -1,6 +1,7 @@
 module.exports = {
     name: "identifier",
     updatable: false,
+    isNestedProperty: true,
     schema: [
       {
         field: "identifier",

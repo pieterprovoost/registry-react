@@ -16,7 +16,6 @@ import Button from '@material-ui/core/Button';
 import history from '../../history'
 
 const baseEndpoint = require('../../config/config').dataApi;
-const adminEndpoint = require('../../config/config').userAdminApi;
 
 const styles = theme => ({
     root: {
@@ -53,7 +52,7 @@ class RegistryForm extends React.Component {
         this.getData = this.getData.bind(this);
         this.getFormField = this.getFormField.bind(this);
         this.exitEditMode = this.exitEditMode.bind(this);
-        const isNestedProperty = (this.props.id && this.props.data);
+        const isNestedProperty = (this.props.id && this.props.data) || this.props.config.isNestedProperty;
         let editMode = !this.props.id || this.props.id === 'new' || isNestedProperty
         this.state = {
             resolved: !this.props.id || this.props.id === 'new' || isNestedProperty,
@@ -85,8 +84,7 @@ class RegistryForm extends React.Component {
     }
     getData() {
         var that = this;
-        const { path, id } = this.props;
-        const ep = (path !== 'user') ? `${baseEndpoint}${path}/${id}` : `${adminEndpoint}${id}`;
+        const { config, id } = this.props;
         let gbifusr = sessionStorage.getItem('gbifusr');
         let gbifpw = sessionStorage.getItem('gbifpw');
         const axConfig = {
@@ -95,7 +93,7 @@ class RegistryForm extends React.Component {
                 password: gbifpw
             }
         }
-        axios(ep, axConfig)
+        axios(`${config.endpoint}/${id}`, axConfig)
             .then((result) => {
                 that.setState({ resolved: true, data: result.data })
             })
@@ -179,14 +177,15 @@ class RegistryForm extends React.Component {
     }
     saveData = () => {
         var that = this;
-        const { path, id, onSave } = this.props;
+        const { path, id, onSave, config } = this.props;
         const { data, isNestedProperty } = this.state;
-        const putEndpoint = (path !== 'user') ? `${baseEndpoint}${path}/${id}` : `${adminEndpoint}${id}`;
-        const postEndpoint = (path !== 'user') ? `${baseEndpoint}${path}` : adminEndpoint;
+        const putEndpoint = (isNestedProperty) ? `${baseEndpoint}${path}/${id}` : `${config.endpoint}/${id}` ;
+        const postEndpoint = (isNestedProperty) ? `${baseEndpoint}${path}` : config.endpoint;
         let endpoint = (id && id !== 'new') ? putEndpoint : postEndpoint;
         let method = (id && id !== 'new') ? 'put' : 'post';
         let gbifusr = sessionStorage.getItem('gbifusr');
         let gbifpw = sessionStorage.getItem('gbifpw');
+        console.log(endpoint)
         const axConfig = {
             auth: {
                 username: gbifusr,

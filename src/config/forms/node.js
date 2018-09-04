@@ -1,6 +1,9 @@
+const config = require('../config');
+
 module.exports = {
     "name": "node",
     "readOnly": true,
+    "endpoint": `${config.dataApi}node`,
     "schema": [
       {
         field: "title",

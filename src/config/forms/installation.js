@@ -1,5 +1,8 @@
+const config = require('../config');
+
 module.exports = {
     "name": "installation",
+    "endpoint": `${config.dataApi}installation`,
     "schema": [
         {
             field: "title",

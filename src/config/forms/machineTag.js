@@ -1,6 +1,7 @@
 module.exports = {
     name: "machineTag",
     updatable: false,
+    isNestedProperty: true,
     schema: [
       {
         field: "name",

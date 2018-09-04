@@ -1,6 +1,7 @@
 module.exports = {
     name: "endpoint",
     updatable: false,
+    isNestedProperty: true,
     schema: [
       {
         field: "type",

@@ -1,6 +1,7 @@
 module.exports = {
     name: "tag",
     updatable: false,
+    isNestedProperty: true,
     schema: [
       {
         field: "content",

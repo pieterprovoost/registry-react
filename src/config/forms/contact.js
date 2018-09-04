@@ -1,6 +1,7 @@
 module.exports = {
     name: "contact",
     updatable: true,
+    isNestedProperty: true,
     schema: [
         {
             field: "type",
