@@ -253,6 +253,7 @@ class RegistryForm extends React.Component {
                 return <ChipInput
                     key={config.field}
                     fullWidth={true}
+                    blurBehavior="add"
                     label={`${config.field}(s)`}
                     value={this.state.data[config.field]}
                     onAdd={(chip) => this.handleAddChip(chip, config.field)}
