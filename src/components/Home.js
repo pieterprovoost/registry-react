@@ -4,6 +4,8 @@ import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import { withStyles } from '@material-ui/core/styles';
 
+import FormBuilder from './Identifiers/FormBuilder'
+
 const styles = theme => ({
     root: {
         flexGrow: 1,
@@ -16,6 +18,18 @@ const styles = theme => ({
     }
 });
 class Home extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange = (value, more, evenmore) => {
+        console.log(value);
+        console.log(more);
+        console.log(evenmore);
+    };
+
     render() {
         const { classes } = this.props
         const usr = sessionStorage.getItem('gbifusr');
@@ -30,7 +44,12 @@ class Home extends React.Component {
                         alignItems="center"
                     >
                         Welcome {usr}
-                        </Grid>
+                    </Grid>
+
+
+
+                    {usr === 'mhoefft' && <FormBuilder values={{email: 'test@test.test'}} onSubmit={this.handleChange} onCancel={this.handleChange} /> }
+
                 </Paper>
             </RegistryFormWrapper>
         );
