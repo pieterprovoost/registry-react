@@ -12,7 +12,7 @@ import NestedPropertyPage from '../shared/NestedPropertyPage'
 import EntitylistPage from '../shared/EntityListPage'
 import CustomizedSnackbar from './CustomizedSnackbar'
 
-//const config = require('../../config/forms/organization')
+const FORM_CONFIG = require('../../config/forms')
 
 function TabContainer(props) {
   return (
@@ -37,25 +37,25 @@ const styles = theme => ({
 
 class EntityPage extends Component {
 
-  constructor(props) {
-    super(props);
-    const { pathname } = this.props.location;
-    const config = require(`../../config/forms/${pathname.split('/')[1]}`)
-    this.onFormSave = this.onFormSave.bind(this);
-    this.state = {
-      value: this.props.match.params.section || 'root',
-      config: config,
-      snackbar: {
-        variant: 'success',
-        message: 'test',
-        open: false
-      }
-    }
+    constructor(props) {
+        super(props);
+        const {pathname} = this.props.location;
+        const config = require(`../../config/forms/${pathname.split('/')[1]}`)
+        this.onFormSave = this.onFormSave.bind(this);
+        this.state = {
+            value: this.props.match.params.section || 'root',
+            config: config,
+            snackbar: {
+              variant: 'success',
+              message: 'test',
+              open: false
+            }
+          }
 
-  };
-  onFormSave(id) {
-    this.setState({ snackbar: { variant: 'success', message: 'Saved successfully', open: true } })
-  }
+    };
+    onFormSave(id) {
+      this.setState({ snackbar: { variant: 'success', message: 'Saved successfully', open: true } })
+    }
   handleChange = (event, value) => {
     this.setState({ value });
   };
@@ -64,7 +64,7 @@ class EntityPage extends Component {
     const { classes } = this.props;
     const { value, config, snackbar } = this.state;
     const { match: { params: { key } } } = this.props;
-    const tabs = config.nestedReadOnly.concat(config.nested.concat(config.relations));
+    const tabs = config.nestedReadOnly.concat(config.nested.concat(config.relations)) ;
 
     const tabElements = tabs.map(name => {
       return <Tab key={name} value={name} label={name} to={`/${config.name}/${this.props.match.params.key}/${name}`} component={NavLink} />
@@ -86,10 +86,10 @@ class EntityPage extends Component {
         </AppBar>
         {value === 'root' && <TabContainer><RegistryFormWrapper><RegistryForm config={config} path={`${config.name}`} id={this.props.match.params.key} onSave={this.onFormSave}></RegistryForm></RegistryFormWrapper></TabContainer>}
         {config.nestedReadOnly.map(function (type) {
-          return (value === type) ? <TabContainer key={type}><NestedPropertyPage config={require(`../../config/forms/${type}`)} path={`${config.name}/${key}/${type}`} readOnly={true}></NestedPropertyPage></TabContainer> : "";
+          return (value === type) ? <TabContainer key={type}><NestedPropertyPage  config={FORM_CONFIG[type]} path={`${config.name}/${key}/${type}`} readOnly={true}></NestedPropertyPage></TabContainer> : "";
         })}
         {config.nested.map(function (type) {
-          return (value === type) ? <TabContainer key={type}><NestedPropertyPage config={require(`../../config/forms/${type}`)} path={`${config.name}/${key}/${type}`} ></NestedPropertyPage></TabContainer> : "";
+          return (value === type) ? <TabContainer key={type}><NestedPropertyPage  config={FORM_CONFIG[type]} path={`${config.name}/${key}/${type}`} ></NestedPropertyPage></TabContainer> : "";
         })}
         {config.relations.map(function (type) {
           return (value === type) ? <TabContainer key={type}><EntitylistPage endpoint={`${config.name}/${key}/${type}`} path={type}></EntitylistPage></TabContainer> : "";
