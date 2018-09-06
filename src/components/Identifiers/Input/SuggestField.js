@@ -9,15 +9,12 @@ class SuggestField extends Component {
   }
 
   handleRelationChange = (item, name) => {
-    console.log('change');
-    console.log(item);
-    this.props.setFieldValue(name, item.key, true);
+    this.props.setFieldValue(name, item, true);
     this.props.setFieldTouched(name, true, true);
   };
 
   render() {
     const { name } = this.props;
-    console.log(this.props.errors);
     return (
       <div>
         <RegistrySuggest

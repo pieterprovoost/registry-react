@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import { withStyles } from '@material-ui/core/styles';
 
-import FormBuilder from './Identifiers/FormBuilder'
+import FormHandler from './Identifiers/FormHandler'
 
 const styles = theme => ({
     root: {
@@ -48,7 +48,7 @@ class Home extends React.Component {
 
 
 
-                    {usr === 'mhoefft' && <FormBuilder values={{email: 'test@test.test'}} onSubmit={this.handleChange} onCancel={this.handleChange} /> }
+                    {usr === 'mhoefft' && <FormHandler values={{email: 'test@test.test'}} onSubmit={this.handleChange} onCancel={this.handleChange} /> }
 
                 </Paper>
             </RegistryFormWrapper>

@@ -3,14 +3,16 @@ import DisplayFormikState from './DisplayFormikState';
 import React, { Component } from 'react';
 import { Formik, withFormik } from 'formik';
 import * as yup from 'yup';
+import _ from 'lodash';
 
 import { withStyles } from '@material-ui/core/styles';
 //import TextField from '@material-ui/core/TextField';
-import TextField from './Input/TextField';
-import ChipField from './Input/ChipField';
-import SuggestField from './Input/SuggestField';
+import TextField from './input/TextField';
+import ChipField from './input/ChipField';
+import SuggestField from './input/SuggestField';
 
-import CoordinateInput from './Input/CoordinateInput';
+import CoordinateInput from './input/CoordinateInput';
+import LocationField from './input/LocationField';
 
 const styles = theme => ({
   textField: {
@@ -27,7 +29,7 @@ const formConfig = {
       mapping: 'nested.location.firstName',
       component: TextField,
       validationSchema: yup.string()
-        .min(2, 'C\'mon your name is longer than that')
+        .min(1, 'C\'mon! Your name cannot be that short.')
         .required('A first name is required.')
     },
     {
@@ -36,10 +38,24 @@ const formConfig = {
       mapping: 'nested.location.email',
       component: TextField,
       validationSchema: yup.string()
-        .email('Invalid email address')
+        .email('That no email - why you try to cheat?')
         .required('Email is required.')
     }
-  ]
+  ],
+  postify: function(formData) {
+    let postData = _.clone(formData);
+    postData.latitude = postData.coordinate[0];
+    postData.longitude = postData.coordinate[1];
+    delete postData.coordinate;
+    return postData;
+  },
+  formify: function(apiData) {
+    let formData = _.clone(apiData);
+    formData.coordinate = [apiData.latitude, apiData.longitude];
+    delete formData.latitude;
+    delete formData.longitude;
+    return formData;
+  }
 };
 
 class FormBuilder extends Component {
@@ -55,7 +71,7 @@ class FormBuilder extends Component {
       values
     } = this.props;
 
-    let handleSubmit = this.props.onSubmit;
+    let handleSubmit = (data) => {this.props.onSubmit(formConfig.postify(data))};
     let handleCancel = this.props.onCancel;
 
     // construct validation schema from config file
@@ -71,18 +87,10 @@ class FormBuilder extends Component {
       );
     validationSchema.coordinate = yup.array().of(
         yup.number()
+          .required('Coordinate required.')
           .min(-180, 'Must be more than -180')
           .max(180, 'Must be less than 180')
-          .required('Coordinate required.')
       );
-    validationSchema.latitude = yup.number()
-      .min(-90, 'Must be more than -90')
-      .max(90, 'Must be less than 90')
-      .required('Latitude required.');
-    validationSchema.longitude = yup.number()
-      .min(-180, 'Must be more than -180')
-      .max(180, 'Must be less than 180')
-      .required('Longitude required.');
 
     validationSchema.organization = yup.string()
       .required('publisher required.')
@@ -92,13 +100,11 @@ class FormBuilder extends Component {
 
     let startValues = {};
     formConfig.fields.forEach(function (e) {
-      startValues[e.name] = values[e.name] || '';
+      startValues[e.name] = values ? values[e.name] || 'start' : 'start';
     });
-    startValues.coordinate = 50;
-    startValues.emails = ['sdf'];
-    startValues.latitude = 0;
-    startValues.longitude = 0;
-    startValues.organization = '';
+    startValues.coordinate = [50, 75];
+    startValues.emails = ['sdf@sdf.df', 'morten@sdf.l'];
+    startValues.organization = '1bb0cdae-54b7-4648-af44-bf7eecfdf692';
 
     return (
       <div>
@@ -134,7 +140,7 @@ class FormBuilder extends Component {
                 {inputs}
                 <ChipField {...props} name="emails" label="emails" />
                 <h1>sdf</h1>
-                <SuggestField {...props} name="organization" label="Publisher" type="organization"/>
+                <SuggestField {...props} name="organization" label="organization" type="organization"/>
                 
                 <CoordinateInput
                   id="coordinate"
@@ -142,8 +148,10 @@ class FormBuilder extends Component {
                   onChange={setFieldValue}
                   error={errors.coordinate && touched.coordinate}
                   helperText={errors.coordinate}
-                  value={50}
+                  value={values.coordinate}
                 />
+
+                <LocationField {...props} name="coordinate"/>
 
                 <button type="submit" disabled={isSubmitting}>
                   Submit
