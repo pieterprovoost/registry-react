@@ -141,7 +141,7 @@ class RegistrySuggest extends React.Component {
     return (
       <div className={classes.root}>
         <Downshift id="downshift-simple"
-          onChange={onChange}
+          onChange={selectedItem => onChange(selectedItem.key)}
           selectedItem={selected}
           itemToString={item => (item ? item.title : '')}
         >

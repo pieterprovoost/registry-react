@@ -130,6 +130,9 @@ class EntityListPage extends React.Component {
           rowsPerPageOptions: [25, 50, 100]
         });
       })
+      .catch(function(err){
+        that.setState({error: err})
+      })
   }
   getItemText(elm) {
     const { path } = this.props;

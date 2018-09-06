@@ -14,6 +14,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Button from '@material-ui/core/Button';
 import history from '../../history'
+import RegistryTextArrayInput from './RegistryTextArrayInput'
 
 const baseEndpoint = require('../../config/config').dataApi;
 
@@ -119,7 +120,7 @@ class RegistryForm extends React.Component {
         }
     }
 
-    handleChange = config => event => {
+    handleFormElmChange = config => event => {
         var data = { ...this.state.data }
         if (config && (config.type === 'nestedText' || config.type === 'nestedEnum')) {
             let splitted = config.field.split('.');
@@ -138,43 +139,16 @@ class RegistryForm extends React.Component {
         console.log(data)
     };
 
-    handleRelationChange = (selectedItem, field) => {
+    handleChange = (selectedItem, field) => {
         var data = { ...this.state.data }
-        data[field] = selectedItem.key
+        data[field] = selectedItem
         this.setState({
             data: data,
         });
         console.log(data)
 
     }
-    setBoolean = (val, field) => {
-        var data = { ...this.state.data }
-        data[field] = val
-        this.setState({
-            data: data,
-        });
-        console.log(data)
-    }
-    handleAddChip = (val, field) => {
-        var data = { ...this.state.data }
-        if (!data[field]) {
-            data[field] = [val]
-        } else {
-            data[field].push(val);
-        }
-        this.setState({
-            data: data,
-        });
-        console.log(data)
-    }
-    handleDeleteChip = (val, index, field) => {
-        var data = { ...this.state.data }
-        data[field].splice(index, 1);
-        this.setState({
-            data: data,
-        });
-        console.log(data)
-    }
+
     saveData = () => {
         var that = this;
         const { path, id, onSave, config } = this.props;
@@ -219,7 +193,7 @@ class RegistryForm extends React.Component {
                     label={config.field}
                     className={classes.textField}
                     value={this.state.data[config.field] || ''}
-                    onChange={this.handleChange(config)}
+                    onChange={this.handleFormElmChange(config)}
                     multiline={config.multiline || false}
                     margin="normal"
                     disabled={!editMode || !config.editable}
@@ -240,7 +214,7 @@ class RegistryForm extends React.Component {
                     label={parentKey}
                     className={classes.textField}
                     value={this.state.data[parentKey][childKey] || ''}
-                    onChange={this.handleChange(config)}
+                    onChange={this.handleFormElmChange(config)}
                     multiline={config.multiline || false}
                     margin="normal"
                     disabled={!editMode || !config.editable}
@@ -249,21 +223,17 @@ class RegistryForm extends React.Component {
                 />
             }
             case "textArray": {
-                return <ChipInput
-                    key={config.field}
-                    fullWidth={true}
-                    blurBehavior="add"
-                    label={`${config.field}(s)`}
-                    value={this.state.data[config.field]}
-                    onAdd={(chip) => this.handleAddChip(chip, config.field)}
-                    onDelete={(chip, index) => this.handleDeleteChip(chip, index, config.field)}
-                    disabled={!editMode || !config.editable}
-                />
+                return <RegistryTextArrayInput 
+                    key={config.field} 
+                    config={config} 
+                    value={this.state.data[config.field]} 
+                    onChange={selectedItem => this.handleChange(selectedItem, config.field)} 
+                    disabled={!editMode || !config.editable}/>
             }
             case "relation": {
                 return <RegistrySuggest
                     key={config.field}
-                    onChange={selectedItem => this.handleRelationChange(selectedItem, config.field)}
+                    onChange={selectedItem => this.handleChange(selectedItem, config.field)}
                     selectedKey={data[config.field]}
                     type={config.name}
                     placeholder={config.field}
@@ -276,7 +246,7 @@ class RegistryForm extends React.Component {
                     multiple={config.multiple}
                     value={data[config.field]}
                     type={config.name}
-                    onChange={this.handleChange(config)}
+                    onChange={this.handleFormElmChange(config)}
                     label={config.field}
                     helperText={config.helperText}
                     disabled={!editMode || !config.editable}
@@ -294,7 +264,7 @@ class RegistryForm extends React.Component {
                     multiple={config.multiple}
                     value={data[parentKey][childKey]}
                     type={config.name}
-                    onChange={this.handleChange(config)}
+                    onChange={this.handleFormElmChange(config)}
                     label={config.field}
                     helperText={config.helperText}
                     disabled={!editMode || !config.editable}
@@ -306,7 +276,7 @@ class RegistryForm extends React.Component {
                     control={
                         <Checkbox
                             checked={this.state.data[config.field]}
-                            onChange={(e, checked) => this.setBoolean(checked, config.field)}
+                            onChange={(e, checked) => this.handleChange(checked, config.field)}
                             disabled={!editMode || !config.editable}
                         />
                     }
