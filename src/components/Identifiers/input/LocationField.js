@@ -30,7 +30,7 @@ class LocationField extends Component {
     let name = this.props.name;
     this.map.on("click", function(e) {
       console.log(e.latlng);
-      setFieldValue(name, [e.latlng.lat, e.latlng.lng], true);
+      setFieldValue(name, e.latlng, true);
     });
 
     // add layer
@@ -46,7 +46,7 @@ class LocationField extends Component {
   updateMarker() {
     const coordinates = this.props.values[this.props.name];
     this.layer.clearLayers();
-    if (coordinates.length == 2 && !this.props.errors[this.props.name]) {
+    if (!this.props.errors[this.props.name]) {
       L.marker(coordinates).addTo(this.layer);
     }
   }
@@ -63,9 +63,9 @@ class LocationField extends Component {
     return (
       <div>
         <div className="locationMap" style={style} id={this.state.mapId} />
-        <input type="text" value={coordinates[0]} onChange={(e) => {setFieldValue(name, [e.target.value, coordinates[1]], true);}} />
-        <input type="text" value={coordinates[1]} onChange={(e) => {setFieldValue(name, [coordinates[0], e.target.value], true);}} />
-        <div>{this.props.errors[name]}</div>
+        <input type="text" value={coordinates.lat} onChange={(e) => {setFieldValue(name, {lat: e.target.value, lng: coordinates.lng}, true);}} />
+        <input type="text" value={coordinates.lng} onChange={(e) => {setFieldValue(name, {lat: coordinates.lat, lng: e.target.value}, true);}} />
+        <div>{JSON.stringify(this.props.errors[name], null, 2)}</div>
       </div>
     );
   }
