@@ -93,18 +93,18 @@ const styles2 = theme => ({
 });
 
 class CustomizedSnackbar extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      open: this.props.open,
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.open) {
-      this.setState({ open: nextProps.open });
+    constructor(props){
+        super(props)
+        this.state = {
+            open: this.props.open,
+          };
     }
-  }
+ 
+    componentWillReceiveProps(nextProps) {
+      if (nextProps.open) {
+        this.setState({ open: nextProps.open });
+      }
+    }
 
 
   handleClose = (event, reason) => {
@@ -113,28 +113,29 @@ class CustomizedSnackbar extends React.Component {
     }
 
     this.setState({ open: false });
+    this.props.onClose(event, reason);
   };
 
   render() {
     const { variant, message } = this.props;
 
     return (
-      <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        open={this.state.open}
-        autoHideDuration={3000}
-        onClose={this.handleClose}
-      >
-        <MySnackbarContentWrapper
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          open={this.state.open}
+          autoHideDuration={6000}
           onClose={this.handleClose}
-          variant={variant}
-          message={message}
-        />
-      </Snackbar>
-
+        >
+          <MySnackbarContentWrapper
+            onClose={this.handleClose}
+            variant={variant}
+            message={message}
+          />
+        </Snackbar>
+        
     );
   }
 }

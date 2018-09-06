@@ -9,12 +9,12 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Switch from '@material-ui/core/Switch';
-import ChipInput from 'material-ui-chip-input'
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Button from '@material-ui/core/Button';
 import history from '../../history'
 import RegistryTextArrayInput from './RegistryTextArrayInput'
+import _ from 'lodash';
 
 const baseEndpoint = require('../../config/config').dataApi;
 
@@ -45,8 +45,6 @@ const styles = theme => ({
     }
 });
 
-
-
 class RegistryForm extends React.Component {
     constructor(props) {
         super(props);
@@ -69,20 +67,22 @@ class RegistryForm extends React.Component {
             this.getData()
         }
     }
-    getDefaultEntity(){
+
+    getDefaultEntity() {
         const { config } = this.props;
-        switch(config.name){
+        switch (config.name) {
             case 'user': {
-                return {roles: [], settings: {}}
+                return { roles: [], settings: {} }
             }
             case 'dataset': {
-                return { citation: {}}
+                return { citation: {} }
             }
             default: {
                 return {};
             }
         }
     }
+
     getData() {
         var that = this;
         const { config, id } = this.props;
@@ -99,6 +99,7 @@ class RegistryForm extends React.Component {
                 that.setState({ resolved: true, data: result.data })
             })
     }
+
     setEditMode = enabled => {
         this.setState({
             editMode: enabled,
@@ -122,26 +123,16 @@ class RegistryForm extends React.Component {
 
     handleFormElmChange = config => event => {
         var data = { ...this.state.data }
-        if (config && (config.type === 'nestedText' || config.type === 'nestedEnum')) {
-            let splitted = config.field.split('.');
-            if(splitted.length !== 2){
-                throw new Error('This doesn´t seem like a nested field. Should have this form: parent.child')
-            }
-            let obj = {};
-            obj[splitted[1]] = event.target.value;
-            data[splitted[0]] = obj;
-        } else {
-            data[config.field] = event.target.value
-        }
+        _.set(data, config.field, event.target.value)
         this.setState({
             data: data,
         });
         console.log(data)
     };
 
-    handleChange = (selectedItem, field) => {
+    handleChange = (value, field) => {
         var data = { ...this.state.data }
-        data[field] = selectedItem
+        _.set(data, field, value)
         this.setState({
             data: data,
         });
@@ -153,7 +144,7 @@ class RegistryForm extends React.Component {
         var that = this;
         const { path, id, onSave, config } = this.props;
         const { data, isNestedProperty } = this.state;
-        const putEndpoint = (isNestedProperty) ? `${baseEndpoint}${path}${id}` : `${config.endpoint}${id}` ;
+        const putEndpoint = (isNestedProperty) ? `${baseEndpoint}${path}${id}` : `${config.endpoint}${id}`;
         const postEndpoint = (isNestedProperty) ? `${baseEndpoint}${path}` : config.endpoint;
         let endpoint = (id && id !== 'new') ? putEndpoint : postEndpoint;
         let method = (id && id !== 'new') ? 'put' : 'post';
@@ -182,6 +173,7 @@ class RegistryForm extends React.Component {
             })
 
     }
+
     getFormField(config) {
         const { classes } = this.props;
         const { data, editMode } = this.state;
@@ -192,28 +184,7 @@ class RegistryForm extends React.Component {
                     id={config.field}
                     label={config.field}
                     className={classes.textField}
-                    value={this.state.data[config.field] || ''}
-                    onChange={this.handleFormElmChange(config)}
-                    multiline={config.multiline || false}
-                    margin="normal"
-                    disabled={!editMode || !config.editable}
-                    helperText={config.helperText}
-
-                />
-            }
-            case "nestedText": {
-                let splitted = config.field.split('.');
-                if(splitted.length !== 2){
-                    throw new Error('This doesn´t seem like a nested field. Should have this form: parent.child')
-                }
-                let parentKey = splitted[0];
-                let childKey = splitted[1];
-                return <TextField
-                    key={parentKey}
-                    id={parentKey}
-                    label={parentKey}
-                    className={classes.textField}
-                    value={this.state.data[parentKey][childKey] || ''}
+                    value={_.get(this.state.data, config.field, '')}
                     onChange={this.handleFormElmChange(config)}
                     multiline={config.multiline || false}
                     margin="normal"
@@ -223,18 +194,18 @@ class RegistryForm extends React.Component {
                 />
             }
             case "textArray": {
-                return <RegistryTextArrayInput 
-                    key={config.field} 
-                    config={config} 
-                    value={this.state.data[config.field]} 
-                    onChange={selectedItem => this.handleChange(selectedItem, config.field)} 
-                    disabled={!editMode || !config.editable}/>
+                return <RegistryTextArrayInput
+                    key={config.field}
+                    config={config}
+                    value={this.state.data[config.field]}
+                    onChange={value => this.handleChange(value, config.field)}
+                    disabled={!editMode || !config.editable} />
             }
             case "relation": {
                 return <RegistrySuggest
                     key={config.field}
                     onChange={selectedItem => this.handleChange(selectedItem, config.field)}
-                    selectedKey={data[config.field]}
+                    selectedKey={_.get(this.state.data, config.field, '')}
                     type={config.name}
                     placeholder={config.field}
                     disabled={!editMode || !config.editable}
@@ -244,25 +215,7 @@ class RegistryForm extends React.Component {
                 return <RegistryEnumSelect
                     key={config.field}
                     multiple={config.multiple}
-                    value={data[config.field]}
-                    type={config.name}
-                    onChange={this.handleFormElmChange(config)}
-                    label={config.field}
-                    helperText={config.helperText}
-                    disabled={!editMode || !config.editable}
-                />
-            }
-            case "nestedEnum": {
-                let splitted = config.field.split('.');
-                if(splitted.length !== 2){
-                    throw new Error('This doesn´t seem like a nested field. Should have this form: parent.child')
-                }
-                let parentKey = splitted[0];
-                let childKey = splitted[1];
-                return <RegistryEnumSelect
-                    key={parentKey}
-                    multiple={config.multiple}
-                    value={data[parentKey][childKey]}
+                    value={_.get(this.state.data, config.field, '')}
                     type={config.name}
                     onChange={this.handleFormElmChange(config)}
                     label={config.field}
@@ -275,7 +228,7 @@ class RegistryForm extends React.Component {
                     key={`${config.field}_label`}
                     control={
                         <Checkbox
-                            checked={this.state.data[config.field]}
+                            checked={_.get(this.state.data, config.field, false)}
                             onChange={(e, checked) => this.handleChange(checked, config.field)}
                             disabled={!editMode || !config.editable}
                         />
@@ -287,6 +240,7 @@ class RegistryForm extends React.Component {
             }
         }
     }
+
     render() {
         const { resolved, editMode, isNestedProperty } = this.state;
         const { classes } = this.props;
@@ -315,7 +269,6 @@ class RegistryForm extends React.Component {
                             label="Edit"
                         />}
                         <Paper className={classes.paper}>
-
                             {formElements}
                             {editMode && <Grid
                                 container

@@ -84,7 +84,7 @@ module.exports = {
     },
     {
         field: "citation.text",
-        type: "nestedText",
+        type: "text",
         multiline: true,
         editable: false
       },

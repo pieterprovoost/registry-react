@@ -28,7 +28,7 @@ module.exports = {
         },
         {
             field: "settings.country",
-            type: "nestedEnum",
+            type: "enum",
             name: "Country",
             editable: true
         },
