@@ -88,6 +88,7 @@ class NestedPropertyList extends React.Component {
 
   render() {
     const { data, config, classes, path, readOnly } = this.props;
+
     const { item } = this.state;
     if(item !== null){
       return <RegistryForm id={item.key} data={item} path={path} config={config} onCancel={this.onCancelForm} onSave={this.onSave}></RegistryForm>
@@ -120,7 +121,10 @@ class NestedPropertyList extends React.Component {
   }
 }
 
-
+NestedPropertyList.propTypes = {
+  classes: PropTypes.object.isRequired,
+  path: PropTypes.string.isRequired,
+};
 
 export default withStyles(styles)(NestedPropertyList);
 

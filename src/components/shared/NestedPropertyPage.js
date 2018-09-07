@@ -142,6 +142,7 @@ class NestedPropertyPage extends React.Component {
 
 NestedPropertyPage.propTypes = {
   classes: PropTypes.object.isRequired,
+  path: PropTypes.string.isRequired,
 };
 
 export default withStyles(styles)(NestedPropertyPage);

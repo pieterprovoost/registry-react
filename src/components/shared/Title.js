@@ -27,7 +27,6 @@ class Title extends Component {
   }
  
   getTitle() {
-    const {type} = this.props;
     if(this.props.id && this.props.id !=='new' && this.props.type !== 'user'){
       axios(`${baseEndpoint}${this.props.type}/${this.props.id}`)
       .then(

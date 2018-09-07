@@ -99,7 +99,7 @@ class EntityListPage extends React.Component {
   getData() {
     const that = this;
     const { endpoint, path } = this.props;
-    const { offset, rowsPerPage, filter, page } = this.state;
+    const { rowsPerPage, filter, page } = this.state;
     
     var url = (endpoint) ? `${baseEndpoint}${endpoint}` : `${baseEndpoint}${path}?limit=${rowsPerPage}&offset=${rowsPerPage * page}`;
     if(path === 'user'){

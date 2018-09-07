@@ -176,7 +176,7 @@ class RegistryForm extends React.Component {
 
     getFormField(config) {
         const { classes } = this.props;
-        const { data, editMode } = this.state;
+        const { editMode } = this.state;
         switch (config.type) {
             case "text": {
                 return <TextField
@@ -237,6 +237,9 @@ class RegistryForm extends React.Component {
                 />
                     {config.helperText && <FormHelperText key={`${config.field}_help`} className={classes.checkBoxHelperText}>{config.helperText}</FormHelperText>}
                 </FormControl>
+            }
+            default: {
+                throw new Error('Unsupported field type: ' + config.type)
             }
         }
     }
