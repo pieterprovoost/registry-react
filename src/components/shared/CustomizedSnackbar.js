@@ -12,6 +12,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import WarningIcon from '@material-ui/icons/Warning';
 import { withStyles } from '@material-ui/core/styles';
+import { SharedSnackbarConsumer } from './SharedSnackbar.context';
 
 const variantIcon = {
   success: CheckCircleIcon,
@@ -93,49 +94,28 @@ const styles2 = theme => ({
 });
 
 class CustomizedSnackbar extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = {
-            open: this.props.open,
-          };
-    }
- 
-    componentWillReceiveProps(nextProps) {
-      if (nextProps.open) {
-        this.setState({ open: nextProps.open });
-      }
-    }
-
-
-  handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    this.setState({ open: false });
-    this.props.onClose(event, reason);
-  };
+   
 
   render() {
-    const { variant, message } = this.props;
 
     return (
-        <Snackbar
+      <SharedSnackbarConsumer>
+     {({ snackbarIsOpen, message, closeSnackbar, variant }) => (   <Snackbar
           anchorOrigin={{
             vertical: 'bottom',
             horizontal: 'right',
           }}
-          open={this.state.open}
-          autoHideDuration={6000}
-          onClose={this.handleClose}
+          open={snackbarIsOpen}
+          autoHideDuration={4000}
+          onClose={closeSnackbar}
         >
           <MySnackbarContentWrapper
-            onClose={this.handleClose}
+            onClose={closeSnackbar}
             variant={variant}
             message={message}
           />
-        </Snackbar>
-        
+        </Snackbar>)}
+        </SharedSnackbarConsumer>
     );
   }
 }

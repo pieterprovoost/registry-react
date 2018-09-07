@@ -7,7 +7,9 @@ import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import RegistryForm from '../shared/RegistryForm'
 import NestedPropertyList from '../shared/NestedPropertyList'
-import CustomizedSnackbar from './CustomizedSnackbar';
+import { SharedSnackbarConsumer } from './SharedSnackbar.context';
+
+
 const baseEndpoint = require('../../config/config').dataApi;
 
 
@@ -36,12 +38,8 @@ class NestedPropertyPage extends React.Component {
     this.state = {
       resolved: false,
       data: [],
-      showForm: false,
-      snackbar: {
-        variant: 'success',
-        message: 'test',
-        open: false
-      }
+      showForm: false
+
     };
 
   }
@@ -81,14 +79,14 @@ class NestedPropertyPage extends React.Component {
         })
     }
   }
-  onFormSave(id) {
+  onFormSave(id, openSnackbar) {
     var that = this;
     this.getData().then(function () {
       const { data } = that.state;
       for (var i = 0; i < data.length; i++) {
         if (data[i].key === id) {
           let msg = `${that.getItemText(data[i])} successfully saved`
-          that.setState({ snackbar: { variant: 'success', message: msg, open: true } })
+          openSnackbar(msg, 'success')
           break;
         }
       }
@@ -96,11 +94,11 @@ class NestedPropertyPage extends React.Component {
     });
 
   }
-  onDeleteItem(item) {
+  onDeleteItem(item, openSnackbar) {
     var that = this;
     this.getData().then(function () {
       let txt = `${that.getItemText(item)} deleted successfully`;
-      that.setState({ snackbar: { variant: 'warning', message: txt, open: true } })
+      openSnackbar(txt, 'warning')
     })
   }
   toggleForm() {
@@ -108,34 +106,36 @@ class NestedPropertyPage extends React.Component {
   }
   render() {
     const { classes, path, config, readOnly } = this.props;
-    const { data, showForm, snackbar } = this.state;
+    const { data, showForm } = this.state;
     return (
-      <div className={classes.root}>
-        <Grid container spacing={8}>
-          <Grid item xs={false} md={2} />
-          <Grid item xs={12} md={8}
-            container
-            direction="row"
-            justify="flex-end"
-            alignItems="center">
-            {!showForm && !readOnly && <Button variant="contained" color="primary" className={classes.button} onClick={this.toggleForm}>Add new</Button>}
-          </Grid>
-          <Grid item xs={false} md={2} />
-          <Grid item xs={false} md={2} />
-          <Grid item xs={12} md={8}>
-            {showForm && <RegistryForm config={config} path={path} onCancel={this.toggleForm} onSave={this.onFormSave}></RegistryForm>}
-          </Grid><Grid item xs={false} md={2} />
-          <Grid item xs={false} md={2} />
-          <Grid item xs={12} md={8}>
-            <Paper className={classes.paper}>
-              <NestedPropertyList data={data} path={path} config={config} onChange={this.onFormSave} onDeleteItem={this.onDeleteItem} readOnly={readOnly}></NestedPropertyList>
-            </Paper>
+      <SharedSnackbarConsumer>
+        {({ openSnackbar }) => (
+          <div className={classes.root}>
+            <Grid container spacing={8}>
+              <Grid item xs={false} md={2} />
+              <Grid item xs={12} md={8}
+                container
+                direction="row"
+                justify="flex-end"
+                alignItems="center">
+                {!showForm && !readOnly && <Button variant="contained" color="primary" className={classes.button} onClick={this.toggleForm}>Add new</Button>}
+              </Grid>
+              <Grid item xs={false} md={2} />
+              <Grid item xs={false} md={2} />
+              <Grid item xs={12} md={8}>
+                {showForm && <RegistryForm config={config} path={path} onCancel={this.toggleForm} onSave={(id) => this.onFormSave(id, openSnackbar)}></RegistryForm>}
+              </Grid><Grid item xs={false} md={2} />
+              <Grid item xs={false} md={2} />
+              <Grid item xs={12} md={8}>
+                <Paper className={classes.paper}>
+                  <NestedPropertyList data={data} path={path} config={config} onChange={(id) => this.onFormSave(id, openSnackbar)} onDeleteItem={(item) => this.onDeleteItem(item, openSnackbar)} readOnly={readOnly}></NestedPropertyList>
+                </Paper>
 
-          </Grid>
-          <Grid item xs={false} md={2} />
-        </Grid>
-       {snackbar.open && <CustomizedSnackbar message={snackbar.message} variant={snackbar.variant} open={snackbar.open}></CustomizedSnackbar>}
-      </div>
+              </Grid>
+              <Grid item xs={false} md={2} />
+            </Grid>
+          </div>)}
+      </SharedSnackbarConsumer>
     );
   }
 }

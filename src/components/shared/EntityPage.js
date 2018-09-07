@@ -10,7 +10,7 @@ import RegistryForm from '../shared/RegistryForm'
 import RegistryFormWrapper from '../shared/RegistryFormWrapper'
 import NestedPropertyPage from '../shared/NestedPropertyPage'
 import EntitylistPage from '../shared/EntityListPage'
-import CustomizedSnackbar from './CustomizedSnackbar'
+import { SharedSnackbarConsumer } from './SharedSnackbar.context';
 
 const FORM_CONFIG = require('../../config/forms')
 
@@ -41,37 +41,20 @@ class EntityPage extends Component {
     super(props);
     const { pathname } = this.props.location;
     const config = require(`../../config/forms/${pathname.split('/')[1]}`)
-    this.onFormSave = this.onFormSave.bind(this);
     this.state = {
       value: this.props.match.params.section || 'root',
-      config: config,
-      snackbar: {
-        variant: 'success',
-        message: 'test',
-        open: false
-      }
+      config: config
     }
 
   };
-  onFormSave(id) {
-    this.setState({ snackbar: { variant: 'success', message: 'Saved successfully', open: true } })
-  }
-  onSnackbarClose = () => {
-    this.setState({
-      snackbar: {
-        variant: 'success',
-        message: 'test',
-        open: false
-      }
-    });
-  }
+
   handleChange = (event, value) => {
     this.setState({ value });
   };
 
   render() {
     const { classes } = this.props;
-    const { value, config, snackbar } = this.state;
+    const { value, config } = this.state;
     const { match: { params: { key } } } = this.props;
     const tabs = config.nestedReadOnly.concat(config.nested.concat(config.relations));
 
@@ -79,32 +62,36 @@ class EntityPage extends Component {
       return <Tab key={name} value={name} label={name} to={`/${config.name}/${this.props.match.params.key}/${name}`} component={NavLink} />
     });
     return (
-      <div className={classes.root}>
-        <AppBar position="static" color="default">
-          <Tabs
-            value={value}
-            onChange={this.handleChange}
-            indicatorColor="primary"
-            textColor="primary"
-            scrollable
-            scrollButtons="auto"
-          >
-            <Tab value="root" label={config.name} to={`/${config.name}/${this.props.match.params.key}`} component={NavLink} />
-            {key !== 'new' && tabElements}
-          </Tabs>
-        </AppBar>
-        {value === 'root' && <TabContainer><RegistryFormWrapper><RegistryForm config={config} path={`${config.name}`} id={this.props.match.params.key} onSave={this.onFormSave}></RegistryForm></RegistryFormWrapper></TabContainer>}
-        {config.nestedReadOnly.map(function (type) {
-          return (value === type) ? <TabContainer key={type}><NestedPropertyPage config={FORM_CONFIG[type]} path={`${config.name}/${key}/${type}`} readOnly={true}></NestedPropertyPage></TabContainer> : "";
-        })}
-        {config.nested.map(function (type) {
-          return (value === type) ? <TabContainer key={type}><NestedPropertyPage config={FORM_CONFIG[type]} path={`${config.name}/${key}/${type}`} ></NestedPropertyPage></TabContainer> : "";
-        })}
-        {config.relations.map(function (type) {
-          return (value === type) ? <TabContainer key={type}><EntitylistPage endpoint={`${config.name}/${key}/${type}`} path={type}></EntitylistPage></TabContainer> : "";
-        })}
-        {snackbar.open && <CustomizedSnackbar message={snackbar.message} variant={snackbar.variant} open={snackbar.open} onClose={this.onSnackbarClose}></CustomizedSnackbar>}
-      </div>
+      <SharedSnackbarConsumer>
+        {({ openSnackbar }) => (
+          <div className={classes.root}>
+
+            <AppBar position="static" color="default">
+              <Tabs
+                value={value}
+                onChange={this.handleChange}
+                indicatorColor="primary"
+                textColor="primary"
+                scrollable
+                scrollButtons="auto"
+              >
+                <Tab value="root" label={config.name} to={`/${config.name}/${this.props.match.params.key}`} component={NavLink} />
+                {key !== 'new' && tabElements}
+              </Tabs>
+            </AppBar>
+            {value === 'root' && <TabContainer><RegistryFormWrapper><RegistryForm config={config} path={`${config.name}`} id={this.props.match.params.key} onSave={() => openSnackbar('Saved successfully', 'success')}></RegistryForm></RegistryFormWrapper></TabContainer>}
+            {config.nestedReadOnly.map(function (type) {
+              return (value === type) ? <TabContainer key={type}><NestedPropertyPage config={FORM_CONFIG[type]} path={`${config.name}/${key}/${type}`} readOnly={true}></NestedPropertyPage></TabContainer> : "";
+            })}
+            {config.nested.map(function (type) {
+              return (value === type) ? <TabContainer key={type}><NestedPropertyPage config={FORM_CONFIG[type]} path={`${config.name}/${key}/${type}`} ></NestedPropertyPage></TabContainer> : "";
+            })}
+            {config.relations.map(function (type) {
+              return (value === type) ? <TabContainer key={type}><EntitylistPage endpoint={`${config.name}/${key}/${type}`} path={type}></EntitylistPage></TabContainer> : "";
+            })}
+
+          </div>)}
+      </SharedSnackbarConsumer>
     );
   }
 }

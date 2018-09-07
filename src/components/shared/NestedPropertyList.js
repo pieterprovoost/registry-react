@@ -32,7 +32,7 @@ class NestedPropertyList extends React.Component {
     this.editItem = this.editItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
-    this.state = {item: null}
+    this.state = { item: null }
   }
 
   getItemText(elm) {
@@ -53,33 +53,33 @@ class NestedPropertyList extends React.Component {
     }
   }
 
-  editItem  = item =>{
-        this.setState({item: item})
+  editItem = item => {
+    this.setState({ item: item })
   }
   deleteItem = item => {
     var that = this;
-    const {path} = this.props;
+    const { path } = this.props;
     let gbifusr = sessionStorage.getItem('gbifusr');
     let gbifpw = sessionStorage.getItem('gbifpw');
     const axConfig = {
-        auth: {
-            username: gbifusr,
-            password: gbifpw
-        }
+      auth: {
+        username: gbifusr,
+        password: gbifpw
+      }
     }
     axios.delete(`${baseEndpoint}${path}/${item.key}`, axConfig)
-        .then(function (res) {
-          that.props.onDeleteItem(item)
-        })
+      .then(function (res) {
+        that.props.onDeleteItem(item)
+      })
   }
-  onCancelForm = () =>{
-    this.setState({item: null})
+  onCancelForm = () => {
+    this.setState({ item: null })
 
   }
-  onSave = (id) =>{
+  onSave = (id) => {
     let itemId = this.state.item.key
-    this.setState({item: null})
-    if(id) {
+    this.setState({ item: null })
+    if (id) {
       this.props.onChange(id)
     } else {
       this.props.onChange(itemId)
@@ -90,16 +90,16 @@ class NestedPropertyList extends React.Component {
     const { data, config, classes, path, readOnly } = this.props;
 
     const { item } = this.state;
-    if(item !== null){
+    if (item !== null) {
       return <RegistryForm id={item.key} data={item} path={path} config={config} onCancel={this.onCancelForm} onSave={this.onSave}></RegistryForm>
-    } 
-    else if(data.length > 0){
+    }
+    else if (data.length > 0) {
       return (
         <List>
           {data.map(elm => {
             return <ListItem key={elm.key}>
               <ListItemText primary={this.getItemText(elm)} secondary={`Created ${moment(elm.createdAt).format('LL')} by ${elm.createdBy}`} />
-             {!readOnly && <ListItemSecondaryAction>
+              {!readOnly && <ListItemSecondaryAction>
                 {config.updatable && <IconButton aria-label="Edit" value={elm} onClick={(e) => this.editItem(elm)}>
                   <EditIcon />
                 </IconButton>}
@@ -113,9 +113,9 @@ class NestedPropertyList extends React.Component {
       );
     } else {
       return <Grid container
-      direction="row"
-      justify="center"
-      alignItems="center"><Typography className={classes.typography}>No data</Typography></Grid>
+        direction="row"
+        justify="center"
+        alignItems="center"><Typography className={classes.typography}>No data</Typography></Grid>
     }
 
   }

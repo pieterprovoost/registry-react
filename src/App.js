@@ -24,6 +24,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Hidden from '@material-ui/core/Hidden';
 import AppBarTitle from './components/AppBarTitle';
 import Login from './components/Login';
+import { SharedSnackbarProvider } from './components/shared/SharedSnackbar.context';
 
 
 const theme = createMuiTheme({
@@ -134,6 +135,7 @@ class App extends Component {
               </Drawer>
             </Hidden>
             <main className={classes.content}>
+            <SharedSnackbarProvider>
               <div className={classes.toolbar} />
               <Switch>
                 <Route exact path="/" render={(props) => <Home />} />
@@ -147,6 +149,7 @@ class App extends Component {
                 <Route exact  path="/login" component={Login} />
                 <Route component={NoMatch} />
               </Switch>
+              </SharedSnackbarProvider>
             </main>
           </div>
         </MuiThemeProvider>

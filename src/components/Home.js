@@ -48,7 +48,7 @@ class Home extends React.Component {
 
 
 
-                    {usr === 'mhoefft' && <FormHandler values={{email: 'test@test.test'}} onSubmit={this.handleChange} onCancel={this.handleChange} /> }
+                    <FormHandler values={{email: 'test@test.test'}} onSubmit={this.handleChange} onCancel={this.handleChange} />
 
                 </Paper>
             </RegistryFormWrapper>
