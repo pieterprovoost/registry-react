@@ -17,6 +17,8 @@ import { NavLink } from "react-router-dom";
 import RegistryFormWrapper from './RegistryFormWrapper';
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 const _ = require('lodash')
 
 const baseEndpoint = require('../../config/config').dataApi;
@@ -35,6 +37,9 @@ const styles = theme => ({
   },
   tableWrapper: {
     overflowX: 'auto',
+  },
+  progress: {
+    margin: theme.spacing.unit * 2,
   },
 });
 
@@ -111,6 +116,7 @@ class EntityListPage extends React.Component {
             password: gbifpw
         }
     }
+    this.setState({loading: true})
     axios(url, axConfig).then((result) => {
       if (this.state.hasOrganization) {
         return that.attachOrganizations(result).catch(function () {
@@ -127,11 +133,12 @@ class EntityListPage extends React.Component {
           rowsPerPage: res.data.limit,
           offset: res.data.offset,
           page: res.data.offset / res.data.limit,
-          rowsPerPageOptions: [25, 50, 100]
+          rowsPerPageOptions: [25, 50, 100],
+          loading: false
         });
       })
       .catch(function(err){
-        that.setState({error: err})
+        that.setState({error: err, loading: false})
       })
   }
   getItemText(elm) {
@@ -149,9 +156,11 @@ class EntityListPage extends React.Component {
   render() {
     const { classes, path } = this.props;
     const entity = subrouteMappings[path] || path;
-    const { data, rowsPerPage, page, count, rowsPerPageOptions, hasOrganization } = this.state;
+    const { data, rowsPerPage, page, count, rowsPerPageOptions, hasOrganization, loading } = this.state;
     const columns = (hasOrganization) ? [entity, 'organization', 'created', 'modified'] : [entity, 'created', 'modified'];
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, count - page * rowsPerPage);
+    
+    
     return (
       <RegistryFormWrapper>
         <Grid item 
@@ -164,7 +173,15 @@ class EntityListPage extends React.Component {
           </Grid>
       <Paper className={classes.root}>
         <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
+        {loading && <Grid item 
+            container
+            direction="row"
+            justify="center"
+            alignItems="center"
+            className={classes.buttonGrid}>
+            <CircularProgress className={classes.progress} size={50}/>
+          </Grid>}
+        {!loading &&  <Table className={classes.table}>
             <TableHead>
               <TableRow key={1}>
                 {columns.map((n, i) => {
@@ -207,7 +224,7 @@ class EntityListPage extends React.Component {
                 />
               </TableRow>
             </TableFooter>
-          </Table>
+          </Table>}
         </div>
       </Paper>
       </RegistryFormWrapper>
