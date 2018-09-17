@@ -1,14 +1,16 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
 import _ from "lodash";
 import L from "leaflet";
+
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
 
 class LocationField extends Component {
   constructor(props) {
     super(props);
     this.componentDidMount = this.componentDidMount.bind(this);
     this.updateMarker = this.updateMarker.bind(this);
-
     this.state = {
       mapId: Math.random().toString()
     };
@@ -29,7 +31,6 @@ class LocationField extends Component {
     let setFieldValue = this.props.setFieldValue;
     let name = this.props.name;
     this.map.on("click", function(e) {
-      console.log(e.latlng);
       setFieldValue(name, e.latlng, true);
     });
 
@@ -46,8 +47,10 @@ class LocationField extends Component {
   updateMarker() {
     const coordinates = this.props.values[this.props.name];
     this.layer.clearLayers();
-    if (!this.props.errors[this.props.name]) {
-      L.marker(coordinates).addTo(this.layer);
+    if (coordinates && isNumeric(coordinates.lat) && isNumeric(coordinates.lng)) {
+      if (!this.props.errors[this.props.name]) {
+        L.marker(coordinates).addTo(this.layer);
+      }
     }
   }
 
@@ -63,8 +66,8 @@ class LocationField extends Component {
     return (
       <div>
         <div className="locationMap" style={style} id={this.state.mapId} />
-        <input type="text" value={coordinates.lat} onChange={(e) => {setFieldValue(name, {lat: e.target.value, lng: coordinates.lng}, true);}} />
-        <input type="text" value={coordinates.lng} onChange={(e) => {setFieldValue(name, {lat: coordinates.lat, lng: e.target.value}, true);}} />
+        <input type="text" value={_.get(coordinates, 'lat')} onChange={(e) => {setFieldValue(name, {lat: e.target.value, lng: coordinates.lng}, true);}} />
+        <input type="text" value={_.get(coordinates, 'lng')} onChange={(e) => {setFieldValue(name, {lat: coordinates.lat, lng: e.target.value}, true);}} />
         <div>{JSON.stringify(this.props.errors[name], null, 2)}</div>
       </div>
     );

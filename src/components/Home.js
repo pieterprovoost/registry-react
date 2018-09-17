@@ -5,6 +5,8 @@ import Paper from '@material-ui/core/Paper'
 import { withStyles } from '@material-ui/core/styles';
 
 import FormHandler from './Identifiers/FormHandler'
+import testConfig1 from './Identifiers/testConfig1';
+import testConfig2 from './Identifiers/testConfig2';
 
 const styles = theme => ({
     root: {
@@ -46,11 +48,12 @@ class Home extends React.Component {
                         Welcome {usr}
                     </Grid>
 
-
-
-                    {usr === 'mhoefft' && <FormHandler values={{email: 'test@test.test'}} onSubmit={this.handleChange} onCancel={this.handleChange} />}
-
                 </Paper>
+                {usr === 'mhoefft' && 
+                <Paper className={classes.root}>
+                    <FormHandler onSubmit={this.handleChange} onCancel={this.handleChange} config={testConfig2} endpoint='https://registry.gbif-dev.org/installation' id='7857582d-033e-4c54-92e1-330638596cef' />
+                </Paper>
+                }
             </RegistryFormWrapper>
         );
         return element;

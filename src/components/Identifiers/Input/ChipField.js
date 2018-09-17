@@ -30,6 +30,7 @@ class ChipField extends Component {
 
   render() {
     const { name } = this.props;
+    let firstError = this.getFirst(this.props.errors[name]);
     return (
       <ChipInput
         fullWidth={true}
@@ -38,9 +39,10 @@ class ChipField extends Component {
         label={this.props.label}
         value={this.props.values[name]}
         onAdd={(chip) => this.handleAddChip(chip, name)}
-        error={this.getFirst(this.props.errors[name]) && this.props.touched[name]}
-        helperText={this.getFirst(this.props.errors[name])}
+        error={firstError && this.props.touched[name]}
+        helperText={firstError}
         onDelete={(chip, index) => this.handleDeleteChip(index, name)}
+        disabled={this.props.disabled}
       />
     );
   }

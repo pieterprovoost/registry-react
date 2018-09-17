@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
 import RegistrySuggest from '../../shared/RegistrySuggest'
 
 class SuggestField extends Component {
@@ -15,6 +14,9 @@ class SuggestField extends Component {
 
   render() {
     const { name } = this.props;
+    let showError = this.props.errors[name] && this.props.touched[name];
+    console.log(this.props.values[name]);
+    console.log(this.props.type);
     return (
       <div>
         <RegistrySuggest
@@ -22,8 +24,9 @@ class SuggestField extends Component {
           selectedKey={this.props.values[name]}
           type={this.props.type}
           placeholder={this.props.label}
+          disabled={this.props.disabled}
         />
-        {this.props.errors[name] && <p>{this.props.errors[name]}</p>}
+        {showError && <p>{this.props.errors[name]}</p>}
       </div>
     );
   }
